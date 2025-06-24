@@ -1,0 +1,41 @@
+{% extends "dashboard_app/base.html" %}
+{% block title %}レッスン確認{% endblock %}
+{% load humanize %}
+
+{% block content %}
+<h1 class="text-center text-3xl font-extrabold text-gray-800 mt-2 mb-8">レッスン内容の確認</h1>
+<div class="mt-10 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+    <div class="p-4 border rounded shadow-sm">
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+            <dt class="font-semibold text-gray-700">レッスン日</dt>
+            <dd class="text-gray-900">{{ lesson.lesson_date|date:"Y年m月d日" }}</dd>
+            <dt class="font-semibold text-gray-700">都道府県</dt>
+            <dd class="text-gray-900">{{ lesson.prefecture.name }}</dd>
+            <dt class="font-semibold text-gray-700">スキー場</dt>
+            <dd class="text-gray-900">{{ lesson.ski_resort.resort_name }}</dd>
+            <dt class="font-semibold text-gray-700">種別</dt>
+            <dd class="text-gray-900">{{ lesson.activity_type.display_name }}</dd>
+            <dt class="font-semibold text-gray-700">レベル</dt>
+            <dd class="text-gray-900">{{ lesson.get_level_display }}</dd>
+            <dt class="font-semibold text-gray-700">レッスン形態</dt>
+            <dd class="text-gray-900">{{ lesson.get_lesson_type_display }}</dd>
+            <dt class="font-semibold text-gray-700">時間帯</dt>
+            <dd class="text-gray-900">{{ lesson.get_time_slot_display }}</dd>
+            <dt class="font-semibold text-gray-700">担当インストラクター</dt>
+            <dd class="text-gray-900">{{ lesson.instructor.username }}</dd>
+            <dt class="font-semibold text-gray-700">料金</dt>
+            <dd class="text-gray-900">¥ {{ lesson.price|intcomma }}</dd>
+        </dl>
+        <!--予約確定ボタン-->
+        <div class="flex justify-end mt-4">
+            <form method="post" action="{% url 'create_checkout_session' lesson.id %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    予約を確定する
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

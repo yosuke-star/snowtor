@@ -1,0 +1,105 @@
+{% extends 'dashboard_app/base.html' %}
+{% block title %}履歴 | スノトラ{% endblock %}
+{% load humanize %}
+
+{% block content %}
+
+<!-- Alpine.js コンテナ -->
+<div x-data="{ showModal: false, selectedPref: null }" 
+    class="max-w-4xl mx-auto mt-4 sm:mt-8 bg-white p-4 sm:p-6 rounded-lg shadow">
+
+    <h1 class="text-center text-lg sm:text-2xl mb-4 sm:mb-6">レッスン履歴</h1>
+
+    {% for lesson in lessons %}
+        <div class="mb-6 border-b border-gray-200 pb-4">
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm sm:text-base">
+                <dt class="font-semibold text-gray-700">レッスン日</dt>
+                <dd class="text-gray-900">{{ lesson.lesson_date|date:"Y年m月d日" }}</dd>
+
+                <dt class="font-semibold text-gray-700">都道府県</dt>
+                <dd class="text-gray-900">{{ lesson.prefecture.name }}</dd>
+
+                <dt class="font-semibold text-gray-700">スキー場</dt>
+                <dd class="text-gray-900">{{ lesson.ski_resort.resort_name }}</dd>
+
+                <dt class="font-semibold text-gray-700">種別</dt>
+                <dd class="text-gray-900">{{ lesson.activity_type.display_name }}</dd>
+
+                <dt class="font-semibold text-gray-700">レベル</dt>
+                <dd class="text-gray-900">{{ lesson.level_display_ja }}</dd>
+
+                <dt class="font-semibold text-gray-700">レッスン形態</dt>
+                <dd class="text-gray-900">{{ lesson.lesson_type_display_ja }}</dd>
+
+                <dt class="font-semibold text-gray-700">時間帯</dt>
+                <dd class="text-gray-900">{{ lesson.time_slot_display_ja }}</dd>
+
+                <dt class="font-semibold text-gray-700">担当インストラクター</dt>
+                <dd class="text-gray-900">{{ lesson.instructor.username }}</dd>
+
+                <dt class="font-semibold text-gray-700">料金</dt>
+                <dd class="text-gray-900">
+                    {% if lesson.time_slot == 'morning' %}
+                        ¥ {{ lesson.ski_morning_price|intcomma }}
+                    {% elif lesson.time_slot == 'afternoon' %}
+                        ¥ {{ lesson.ski_afternoon_price|intcomma }}
+                    {% elif lesson.time_slot == 'full_day' %}
+                        ¥ {{ lesson.ski_full_day_price|intcomma }}
+                    {% else %}
+                        不明
+                    {% endif %}
+                </dd>
+                
+                <dt class="font-semibold text-gray-700">受講者</dt>
+                <dd class="text-gray-900">
+                    {% if lesson.lessonpreference_set.all %}
+                        {% for pref in lesson.lessonpreference_set.all %}
+                            {{ pref.student.username }}
+                            <!-- キャンセルボタンでモーダル開く -->
+                            <button type="button"
+                                    @click="selectedPref = {{ pref.id }}; showModal = true"
+                                    class="ml-0 mt-2  w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded 
+                                    cursor-pointer hover:bg-red-600 text-sm sm:text-base">
+                                キャンセル
+                            </button>
+                        {% endfor %}
+                    {% else %}
+                        受講者なし
+                        <form method="post" action="{% url 'cancel_lesson' lesson.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-500 underline ml-1 block">このレッスンをキャンセル</button>
+                        </form>
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+    {% empty %}
+        <p>レッスンが登録されていません。</p>
+    {% endfor %}
+
+    <!-- モーダルウィンドウ -->
+    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center shadow-lg">
+        <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-11/12 sm:w-96">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">本当にキャンセルしますか？</h3>
+            <p class="text-sm text-gray-600 mb-6">受講者がいます。この予約をキャンセルしてもよろしいですか？</p>
+
+            <div class="flex justify-center space-x-4">
+                <button @click="showModal = false"
+                        class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+                    やめる
+                </button>
+
+                <form :action="`{% url 'cancel_preference' 0 %}`.replace('0', selectedPref)" method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                        キャンセル実行
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!--/.bg-white-->
+    </div>
+    <!--/.showModal-->
+</div>
+{% endblock %}

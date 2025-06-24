@@ -1,0 +1,59 @@
+{% extends 'dashboard_app/base.html' %}
+{% block title %}ダッシュボード | スノトラ{% endblock %}
+{% block content %}
+<div class="flex flex-col md:flex-row bg-gray-50 p-6 space-y-6 md:space-y-0 md:space-x-6">
+    <!-- 左カラム -->
+    <div class="md:w-2/3 w-full p-4 bg-white rounded-xl shadow-md">
+        <!-- 出勤日表示 -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-800">今日 : {{ today|date:"Y 年 n 月 j 日" }}</h2>
+        </div>
+        <!-- 出勤日カレンダー -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-700 mb-2">出勤カレンダー</h3>
+            <div id="calendar" class="bg-white p-4 rounded shadow-md"></div>
+        </div>
+    </div>
+    <!-- 右カラム -->
+    <div class="md:w-1/3 w-full p-4 bg-white rounded-xl shadow-md">
+        <!-- 担当レッスンの予約者一覧 -->
+        <h3 class="text-lg font-medium text-gray-700 mb-4">予約者一覧</h3>
+        {% if reservation_data %}
+            <ul class="space-y-4">
+                {% for r in reservation_data %}
+                    <li class="p-4 bg-gray-100 rounded-lg">
+                        {{ r.lesson_date|date:"Y年n月j日" }} ({{ r.time_slot }})<br>
+                        受講者：{{ r.student_name }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">現在、予約はありません。</p>
+        {% endif %}
+    </div>
+</div>
+<!--/.flex-->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ja',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek',
+            },
+            eventColor: '#3B82F6',
+            events: '/dashboard/instructor/events/', // Djangoから動的に渡せる
+            contentHeight: 'auto',
+            dayCellContent: function(e) {
+                return {
+                    html: e.dayNumberText.replace('日', '') // 「日」を削除する
+                };
+            },
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

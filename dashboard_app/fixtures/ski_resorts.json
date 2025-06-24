@@ -1,0 +1,154 @@
+[
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 1,
+    "fields": {
+      "resort_name": "ニセコ",
+      "prefecture": 1
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 2,
+    "fields": {
+      "resort_name": "富良野スキー場",
+      "prefecture": 1
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 3,
+    "fields": {
+      "resort_name": "白馬八方尾根",
+      "prefecture": 2
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 4,
+    "fields": {
+      "resort_name": "大鰐温泉スキー場",
+      "prefecture": 3
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 5,
+    "fields": {
+      "resort_name": "安比高原",
+      "prefecture": 4
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 6,
+    "fields": {
+      "resort_name": "夏油高原スキー場",
+      "prefecture": 4
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 7,
+    "fields": {
+      "resort_name": "たざわ湖スキー場",
+      "prefecture": 5
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 8,
+    "fields": {
+      "resort_name": "オニコウベスキー場",
+      "prefecture": 6
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 9,
+    "fields": {
+      "resort_name": "みやぎ蔵王白石スキー場",
+      "prefecture": 6
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 10,
+    "fields": {
+      "resort_name": "蔵王温泉スキー場",
+      "prefecture": 7
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 11,
+    "fields": {
+      "resort_name": "月山スキー場",
+      "prefecture": 7
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 12,
+    "fields": {
+      "resort_name": "湯殿山スキー場",
+      "prefecture": 7
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 13,
+    "fields": {
+      "resort_name": "グランデコスノーリゾート",
+      "prefecture": 8
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 14,
+    "fields": {
+      "resort_name": "猪苗代スキー場",
+      "prefecture": 8
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 15,
+    "fields": {
+      "resort_name": "星野リゾートネコマ マウンテン",
+      "prefecture": 8
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 16,
+    "fields": {
+      "resort_name": "赤倉温泉スキー場",
+      "prefecture": 9
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 17,
+    "fields": {
+      "resort_name": "石打丸山スキー場",
+      "prefecture": 9
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 18,
+    "fields": {
+      "resort_name": "苗場スキー場",
+      "prefecture": 9
+    }
+  },
+  {
+    "model": "dashboard_app.skiresort",
+    "pk": 19,
+    "fields": {
+      "resort_name": "GALA湯沢スキー場",
+      "prefecture": 9
+    }
+  }
+]

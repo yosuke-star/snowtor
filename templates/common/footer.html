@@ -1,0 +1,21 @@
+<footer class="footer bg-blue-100 text-gray-700 p-8">
+    <div class="footer__text-box max-w-7xl mx-auto text-center">
+        <ul class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-8 text-sm">
+            <li class="hover:text-gray-500 transition duration-300 cursor-pointer">
+                <a href="{% url 'about' %}?next={{ request.path }}">このサービスについて</a>
+            </li>
+            <li class="hover:text-gray-500 transition duration-300 cursor-pointer">
+                <a href="{% url 'terms' %}?next={{ request.path }}">利用規約</a>
+            </li>
+            <li class="hover:text-gray-500 transition duration-300 cursor-pointer">
+                <a href="{% url 'privacy' %}?next={{ request.path }}">プライバシーポリシー</a>
+            </li>
+            <li class="hover:text-gray-500 transition duration-300 cursor-pointer">
+                <a href="{% url 'cancel_policy' %}?next={{ request.path }}">キャンセルポリシー</a>
+            </li>
+            <li class="hover:text-gray-500 transition duration-300 cursor-pointer">
+                <a href="{% url 'contact' %}?next={{ request.path }}">お問い合わせ</a>
+            </li>
+        </ul>
+    </div>
+</footer>

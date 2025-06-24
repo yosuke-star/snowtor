@@ -1,0 +1,47 @@
+[
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 1,
+    "fields": { "name": "北海道" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 2,
+    "fields": { "name": "長野県" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 3,
+    "fields": { "name": "青森県" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 4,
+    "fields": { "name": "岩手県" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 5,
+    "fields": { "name": "秋田県" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 6,
+    "fields": { "name": "宮城県" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 7,
+    "fields": { "name": "山形県" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 8,
+    "fields": { "name": "福島県" }
+  },
+  {
+    "model": "dashboard_app.prefecture",
+    "pk": 9,
+    "fields": { "name": "新潟県" }
+  }
+]

@@ -1,0 +1,112 @@
+{% extends 'accounts_app/base.html' %}
+{% block title %}アカウント設定 | スノトラ{% endblock %}
+
+{% block header_extra %}
+    <div class="ml-auto">
+        <a href="{% url 'logout' %}" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+            ログアウト
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="text-center text-2xl sm:text-3xl font-extrabold text-gray-800 mt-2 mb-6 sm:mb-8">ユーザー情報編集</h1>
+<p class="text-center text-base sm:text-xl text-gray-800 mb-6 sm:mb-8">ユーザー情報の編集を行なってください</p>
+
+<div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-md">
+    <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
+        <form action="{% url 'student_setting' %}" method="post" class="space-y-6">
+            {% csrf_token %}
+            <div>
+                {{ user_form.profile_image.label_tag}}
+                {{ user_form.profile_image }}
+            </div>
+            <div>
+                {{ user_form.username.label_tag}}
+                {{ user_form.username }}
+            </div>
+            <div>
+                {{ user_form.gender.label_tag }}
+                <div class="flex items-center space-x-6">
+                    {% for radio in user_form.gender %}
+                        <label class="inline-flex items-center">
+                            {{ radio.tag }}
+                            <span class="ml-1">{{ radio.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                {{ user_form.date_of_birth.label_tag}}
+                {{ user_form.date_of_birth }}
+
+                {% if user_form.date_of_birth.errors %}
+                    <ul class="errorlist text-red-500 text-sm mt-1">
+                    {% for error in user_form.date_of_birth.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div>
+                {{ user_form.postal_code.label_tag}}
+                {{ user_form.postal_code }}
+            </div>
+            <div>
+                {{ user_form.address.label_tag}}
+                {{ user_form.address }}
+            </div>
+            <div>
+                {{ user_form.phone_number.label_tag}}
+                {{ user_form.phone_number }}
+            </div>
+            <div>
+                {{ user_form.email.label_tag}}
+                {{ user_form.email }}
+            </div>
+            <div>
+                {{ password_form.old_password.label_tag}}
+                {{ password_form.old_password }}
+            </div>
+            <div>
+                {{ password_form.new_password1.label_tag}}
+                {{ password_form.new_password1 }}
+            </div>
+            <div>
+                {{ password_form.new_password2.label_tag}}
+                {{ password_form.new_password2 }}
+
+                {% if password_form.new_password2.errors %}
+                    <ul class="errorlist text-red-500 text-sm mt-1">
+                    {% for error in password_form.new_password2.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="pt-8 flex space-x-4">
+                <a 
+                href="{% url 'student_dashboard' %}"
+                class="flex-1 flex justify-center items-center py-3 px-4 border rounded-md shadow-sm
+                        text-base font-bold text-sky-600 border-sky-600
+                        hover:bg-sky-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500
+                        transition duration-300 ease-in-out cursor-pointer">
+                    キャンセル
+                </a>
+                <button 
+                type="submit"
+                class="flex-1 flex justify-center py-3 px-4 border border-transparent rounded-md
+                    shadow-sm text-base font-bold text-white bg-sky-600
+                    hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500
+                    transition duration-300 ease-in-out cursor-pointer">
+                    更新する
+                </button>
+            </div>
+        </form>
+    </div>
+    <!-- /. bg-white-->
+</div>
+<!-- /.container -->
+
+{% endblock %}

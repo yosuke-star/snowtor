@@ -1,0 +1,16 @@
+[
+  {
+    "model": "dashboard_app.activitytype",
+    "pk": 1,
+    "fields": {
+      "activity_name": 1
+    }
+  },
+  {
+    "model": "dashboard_app.activitytype",
+    "pk": 2,
+    "fields": {
+      "activity_name": 2
+    }
+  }
+]

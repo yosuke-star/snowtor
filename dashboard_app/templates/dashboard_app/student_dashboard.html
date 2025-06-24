@@ -1,0 +1,68 @@
+{% extends 'dashboard_app/base.html' %}
+{% block title %}ダッシュボード | スノトラ{% endblock %}
+{% block content %}
+<div class="flex flex-col md:flex-row bg-gray-50 p-6 space-y-6 md:space-y-0 md:space-x-6">
+    <!-- 左カラム -->
+    <div class="md:w-2/3 w-full p-4 bg-white rounded-xl shadow-md">
+        <!-- インストラクター名 -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-800">今日 : {{ today|date:"Y 年 n 月 j 日" }}</h2>
+        </div>
+        <!-- 予定カレンダー -->
+        <div>
+            <h3 class="text-lg font-medium text-gray-700 mb-2">予定カレンダー</h3>
+            <div id="calendar" class="p-4 rounded shadow-md"></div>
+        </div>
+    </div>
+    <!-- 右カラム -->
+    <div class="md:w-1/3 w-full lg:w-1/3 p-4 lg:ml-6 mt-6 lg:mt-0 bg-white rounded-xl shadow-md">
+        <h3 class="text-lg font-medium text-gray-700 mb-4">予約日一覧</h3>
+
+        {% if preferences %}
+            <div class="space-y-4">
+                {% for pref in preferences %}
+                    <div class="p-4 bg-gray-100 rounded-lg">
+                        <div class="text-gray-800 font-semibold">
+                            {{ pref.lesson_detail.lesson_date|date:"n 月 j 日 (D)" }}
+                            {{ pref.lesson_detail.get_time_slot_display }}
+                        </div>
+                        <div class="text-sm text-gray-700">
+                            {{ pref.lesson_detail.ski_resort.resort_name }}
+                        </div>
+                        <div class="text-sm text-gray-700">
+                            インストラクター: {{ pref.lesson_detail.instructor.username }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-500">現在の予約はありません。</p>
+        {% endif %}
+    </div>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ja',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,listWeek',
+            },
+            eventColor: '#3b82f6',
+            events: '/dashboard/student-events/',  // ← 受講者の予約を取得
+            contentHeight: 'auto',
+            dayCellContent: function(e) {
+                return {
+                    html: e.dayNumberText.replace('日', '') // 「日」を削除する
+                };
+            },
+        });
+        calendar.render();
+    });
+</script>
+
+{% endblock %}

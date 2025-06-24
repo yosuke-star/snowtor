@@ -1,0 +1,138 @@
+{% extends "dashboard_app/base.html" %}
+{% block title %}日程調整 | スノトラ{% endblock %}
+
+{% block content %}
+
+<h1 class="text-center text-2xl sm:text-3xl font-extrabold text-gray-800 mt-2 mb-6 sm:mb-8">レッスン詳細編集</h1>
+<p class="text-center text-base sm:text-xl text-gray-800 mb-6 sm:mb-8">レッスン情報を入力してください</p>
+
+<div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-3xl">
+    <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
+        <form method="post" action="{% url 'instructor_schedule' %}" class="space-y-6">
+            {% csrf_token %}
+            <div>
+                {{ form.lesson_date.label_tag }}
+                {{ form.lesson_date }}
+                {% if form.lesson_date.errors %}
+                    <ul class="errorlist text-red-500 text-sm mt-1">
+                    {% for error in form.lesson_date.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- 都道府県 -->
+            <div>
+                {{ form.prefecture.label }}
+                <div class="flex flex-wrap gap-4 mt-2">
+                    {% for radio in form.prefecture %}
+                        <label class="flex items-center space-x-1">
+                            {{ radio.tag }}
+                            <span>{{ radio.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- 非表示の ski_resort コンテナ -->
+            <div id="ski-resort-container" style="display: none;">
+                <label for="id_ski_resort" class="block mb-2">スキー場</label>
+                <div id="ski-resort-options" class="flex flex-wrap gap-4">
+                <!-- JSでここにラジオボタンを挿入 -->
+                </div>
+            </div>
+
+            <div>
+                {{ form.activity_type.label }}
+                {{ form.activity_type }}
+            </div>
+            <div>
+                {{ form.level.label }}
+                {{ form.level }}
+            </div>
+            <div>
+                {{ form.lesson_type.label }}
+                {{ form.lesson_type }}
+            </div>
+            <div>
+                {{ form.max_students.label }}
+                {{ form.max_students }}
+            </div>
+            <div>
+                {{ form.time_slot.label }}
+                {{ form.time_slot }}
+            </div>
+            <div>
+                {{ form.ski_morning_price.label }}
+                {{ form.ski_morning_price }}
+            </div>
+            <div>
+                {{ form.ski_afternoon_price.label }}
+                {{ form.ski_afternoon_price }}
+            </div>
+            <div>
+                {{ form.ski_full_day_price.label }}
+                {{ form.ski_full_day_price }}
+            </div>
+            <div>
+                {{ form.snowboard_morning_price.label }}
+                {{ form.snowboard_morning_price }}
+            </div>
+            <div>
+                {{ form.snowboard_afternoon_price.label }}
+                {{ form.snowboard_afternoon_price }}
+            </div>
+            <div>
+                {{ form.snowboard_full_day_price.label }}
+                {{ form.snowboard_full_day_price }}
+            </div>
+            <div class="pt-8 flex space-x-4">
+                <button
+                type="submit"
+                class="flex w-full justify-center py-3 px-4 border border-transparent rounded-md
+                    shadow-sm text-base font-bold text-white bg-sky-600
+                    hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500
+                    transition duration-300 ease-in-out cursor-pointer">
+                    保存する
+                </button>
+            </div>
+            <!-- スクリプト：都道府県選択でスキー場を取得＆表示 -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const prefectureRadios = document.querySelectorAll('input[name="prefecture"]');
+                    const skiResortContainer = document.getElementById('ski-resort-container');
+                    const skiResortOptions = document.getElementById('ski-resort-options');
+                
+                    prefectureRadios.forEach(radio => {
+                        radio.addEventListener('change', function () {
+                            const prefectureId = this.value;
+                            const url = "{% url 'get_ski_resorts_instructor' %}?prefecture_id=" + prefectureId;
+                
+                            fetch(url)
+                                .then(response => response.json())
+                                .then(data => {
+                                    let html = '';
+                                    data.forEach(resort => {
+                                        html += `
+                                            <label class="flex items-center space-x-1">
+                                                <input type="radio" name="ski_resort" value="${resort.id}">
+                                                <span>${resort.resort_name}</span>
+                                            </label>
+                                        `;
+                                    });
+                                    skiResortOptions.innerHTML = html;
+                                    skiResortContainer.style.display = 'block';  // 表示！
+                                })
+                                .catch(error => {
+                                    console.error('スキー場取得エラー:', error);
+                                });
+                        });
+                    });
+                });
+            </script>
+        </form>
+    </div>
+    <!--/.bg-white-->
+</div>
+<!--/.container-->
+{% endblock %}

@@ -1,0 +1,43 @@
+@import url("https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap");
+
+body {
+  font-family: "Zen Maru Gothic", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* カレンダーの数値を中央寄せ */
+.fc-daygrid-day-top {
+  display: flex;
+  justify-content: center; /* 水平方向に中央寄せ */
+  align-items: center; /* 垂直方向に中央寄せ */
+  height: 100%; /* 高さをセルいっぱいにする */
+  font-size: 1rem; /* 必要に応じて調整 */
+}
+
+/* 日曜日の文字を赤に */
+.fc-day-sun .fc-daygrid-day-number {
+  color: red;
+}
+
+/* 土曜日の文字を青に */
+.fc-day-sat .fc-daygrid-day-number {
+  color: blue;
+}
+
+.fc-toolbar-title {
+  font-size: 1.25rem; /* Tailwindの text-xl 相当 */
+  font-weight: 600;
+}
+
+.fc .fc-button {
+  @apply text-sm px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600;
+}
+
+@media (max-width: 768px) {
+  .fc .fc-header-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

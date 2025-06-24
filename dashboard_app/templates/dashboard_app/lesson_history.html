@@ -1,0 +1,64 @@
+{% extends "dashboard_app/base.html" %}
+{% block title %}レッスン履歴{% endblock %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto mt-8 sm:mt-8 bg-white p-4 sm:p-6 rounded-lg shadow">
+
+    <h1 class="text-center text-xl sm:text-2xl mb-4 sm:mb-6">予約履歴</h1>
+    
+    {% if history_data %}
+        <div class="space-y-4">
+            {% for item in history_data %}
+                <div class="p-4 border rounded shadow-sm">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm sm:text-base">
+                        <dt class="font-semibold text-gray-700">レッスン日</dt>
+                        <dd class="text-gray-900">{{ item.lesson.lesson_date|date:"Y年m月d日" }}</dd>
+
+                        <dt class="font-semibold text-gray-700">スキー場</dt>
+                        <dd class="text-gray-900">{{ item.lesson.ski_resort.resort_name }}</dd>
+
+                        <dt class="font-semibold text-gray-700">種別</dt>
+                        <dd class="text-gray-900">{{ item.lesson.activity_type.display_name }}</dd>
+
+                        <dt class="font-semibold text-gray-700">レベル</dt>
+                        <dd class="text-gray-900">{{ item.lesson.level_display_ja }}</dd>
+
+                        <dt class="font-semibold text-gray-700">レッスン形態</dt>
+                        <dd class="text-gray-900">{{ item.lesson.lesson_type_display_ja }}</dd>
+
+                        <dt class="font-semibold text-gray-700">時間帯</dt>
+                        <dd class="text-gray-900">{{ item.lesson.get_time_slot_display }}</dd>
+
+                        <dt class="font-semibold text-gray-700">担当インストラクター</dt>
+                        <dd class="text-gray-900">{{ item.lesson.instructor.username }}</dd>
+
+                        <dt class="font-semibold text-gray-700">料金</dt>
+                        <dd class="text-gray-900">¥ {{ item.price|default:"-"|intcomma }}</dd>
+                        
+                        <dt class="font-semibold text-gray-700">登録日</dt>
+                        <dd class="text-gray-900">{{ item.preference.created_at|date:"Y年m月d日" }}</dd>
+                    </dl>
+                    <!-- キャンセルボタン -->
+                    <div class="flex sm:justify-end justify-center mt-4">
+                        <form method="POST" action="{% url 'lesson_cancel' item.preference.id %}">
+                            {% csrf_token %}
+                            <button 
+                                type="submit"
+                                aria-label="このレッスンのキャンセル"
+                                class="w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded-md cursor-pointer 
+                                    hover:bg-red-600 text-sm sm:text-base"
+                                >
+                                キャンセル
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center text-sm sm:text-base text-gray-500 mt-4 sm:mt-6">📭 まだレッスンの履歴はありません。</p>
+    {% endif %}
+</div>
+{% endblock %}

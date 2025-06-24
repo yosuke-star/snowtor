@@ -1,0 +1,3 @@
+# .prettierignore
+**/*.django.html
+**/*.html

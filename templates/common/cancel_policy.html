@@ -1,0 +1,18 @@
+{% extends "accounts_app/base.html" %}
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto py-12 px-4 sm:px-8 text-gray-800 text-base sm:text-lg leading-">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">キャンセルポリシー</h1>
+    <p class="mb-4">
+        レッスンのキャンセルについて、以下のルールが適用されます。予約前にご確認ください。
+    </p>
+    <ul class="list-disc list-inside space-y3 text-left">
+        <li>レッスン予定日の2日前までのキャンセル：全額返金</li>
+        <li>レッスン予定日の前日キャンセル：50%返金</li>
+        <li>当日キャンセルまたは無断キャンセル：返金不可</li>
+        <li>天候等によるインストラクター都合の中止は、全額返金いたします。</li>
+    </ul>
+</div>
+
+{% endblock %}
