@@ -1,7 +1,7 @@
 {
   "name": "django-project",
   "version": "1.0.0",
-  "description": "Django project with Bootstrap",
+  "description": "This project is ストトラ",
   "scripts": {
     "build": "npm run build:css",
     "build:css": "sass static/scss:static/css"
