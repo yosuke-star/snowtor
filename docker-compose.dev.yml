@@ -9,7 +9,7 @@ services:
     depends_on:
       - db
     env_file:
-      - .env
+      - .env.development
 
   db:
     image: postgres:15
@@ -27,7 +27,7 @@ services:
       timeout: 5s
       retries: 3
     env_file:
-      - .env
+      - .env.development
 
 volumes:
   snowtor_ps_data:
