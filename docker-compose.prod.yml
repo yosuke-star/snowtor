@@ -7,6 +7,6 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:8000"
+      - "${WEB_PORT_HOST}:${WEB_PORT_CONTAINER}"
     env_file:
       - .env.production
