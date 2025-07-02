@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.health_check, name='health_check'),
+
     # 新規作成 - 受講者 - インストラクター
     path('signup/student/', views.student_signup_view, name="student_signup"),
     path('signup/instructor/', views.instructor_signup_view, name="instructor_signup"),

@@ -7,3 +7,5 @@ pillow==11.2.1
 django-bootstrap5==25.1
 
 stripe
+
+whitenoise==6.5.0

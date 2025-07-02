@@ -5,6 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from .forms import InstructorProfileForm, InstructorSignupForm, CustomPasswordChangeForm, LoginForm, StudentSignupForm, UserUpdateForm
 from .models import CustomUser, InstructorProfile
+from django.http import HttpResponse
+
+def health_check(request):
+    return HttpResponse("OK", status=200)
 
 # 新規登録処理 受講者用
 def student_signup_view(request):
