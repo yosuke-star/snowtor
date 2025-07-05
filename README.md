@@ -28,6 +28,18 @@
 **インストラクターのレッスン予約**
 ![instructor-lesson-detail](https://github.com/user-attachments/assets/b43d48e4-f94b-407f-a220-95ab35aa68cb)
 
+**受講生のレッスン検索**
+![student-resarch](https://github.com/user-attachments/assets/e73aac26-4373-457e-a5ad-ac66e0ee3d03)
+
+**Stripe決済(テスト用)**
+![stripe-fuction](https://github.com/user-attachments/assets/7e25c795-d85b-4080-b21b-dcf3905204e5)
+
+**インストラクター側のレッスンキャンセル**
+![cancel-lesson](https://github.com/user-attachments/assets/75426143-7d00-4288-8f47-e97874314155)
+
+**受講者側のレッスンキャンセル**
+![cancel-student](https://github.com/user-attachments/assets/bc10691f-e056-4816-8c92-c896a207f6ad)
+
 
 
 
