@@ -88,10 +88,6 @@
 - デザインカンプ：Figma
 - ER図：Miro
 
-**システム構成図**
-
-<一枚の絵>
-
 ## ER図
 ![snowtor_ER (1)](https://github.com/user-attachments/assets/4d077139-d937-4485-a5d0-fb97f81ecd45)
 
