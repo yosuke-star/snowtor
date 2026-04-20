@@ -82,6 +82,9 @@ class LessonPreference(models.Model):
     lesson_detail = models.ForeignKey(LessonDetail, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('student', 'lesson_detail')
+
     def __str__(self):
         return f"{self.student.username} → {self.lesson_detail}"
 
