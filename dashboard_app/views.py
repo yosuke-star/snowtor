@@ -192,17 +192,16 @@ def lesson_reserve_view(request, lesson_id):
     if request.user.role != 'student':
         return redirect('lesson_search')  # インストラクターは予約できない
 
-    # 既に予約しているかチェック（重複防止）
-    existing = LessonPreference.objects.filter(student=request.user, lesson_detail=lesson)
-    if existing.exists():
-        # すでに予約済み → 履歴へ飛ばす（後でカスタマイズ可）
+    # 重複予約チェック
+    if LessonPreference.objects.filter(student=request.user, lesson_detail=lesson).exists():
         return redirect('lesson_history')
 
-    # 新規予約作成
-    LessonPreference.objects.create(student=request.user, lesson_detail=lesson)
+    # 定員チェック
+    if LessonPreference.objects.filter(lesson_detail=lesson).count() >= lesson.max_students:
+        return error_response(request, '定員に達しているため予約できません。')
 
-    # 完了ページへリダイレクト（もしくは履歴へ）
-    return redirect('lesson_history') 
+    LessonPreference.objects.create(student=request.user, lesson_detail=lesson)
+    return redirect('lesson_history')
 
 @login_required
 def lesson_history_view(request):
@@ -328,17 +327,21 @@ def create_checkout_session(request, lesson_id):
 
 @login_required
 def payment_success(request, lesson_id):
-    print("成功！！！！！")
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
-    # ここで予約をDBに保存する処理
-    LessonPreference.objects.create(
-        student=request.user,
-        lesson_detail=lesson,
-        # status='confirmed'
-    )
+
+    # ページ再読み込みや戻るボタンによる二重作成を防ぐ
+    if LessonPreference.objects.filter(student=request.user, lesson_detail=lesson).exists():
+        return render(request, 'dashboard_app/payment_success.html')
+
+    # 定員チェック（決済後に他の受講者で埋まった場合を考慮）
+    if LessonPreference.objects.filter(lesson_detail=lesson).count() >= lesson.max_students:
+        return error_response(request, '定員に達しているため予約を完了できませんでした。')
+
+    LessonPreference.objects.create(student=request.user, lesson_detail=lesson)
+    logger.info(f"[PAYMENT_SUCCESS] user={request.user} lesson_id={lesson_id}")
     return render(request, 'dashboard_app/payment_success.html')
 
 @login_required
-def payment_cancel(request):
-    print("キャンセル！！！！！！１")
+def payment_cancel(request, lesson_id):
+    logger.info(f"[PAYMENT_CANCEL] user={request.user} lesson_id={lesson_id}")
     return render(request, 'dashboard_app/payment_cancel.html')
