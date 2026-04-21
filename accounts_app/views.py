@@ -134,26 +134,35 @@ def logout_view(request):
 # ユーザー情報設定 / 更新 - 受講者用
 @login_required
 def student_setting(request):
+    if not request.user.is_student:
+        messages.error(request, '受講者としてログインしてください。')
+        return redirect('student_dashboard')
+
     # 「更新ボタン」が押された時
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
         password_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
 
         user_valid = user_form.is_valid()
-        password_valid = password_form.is_valid()
+
+        # パスワード欄が入力されている場合のみ検証・保存
+        password_fields_filled = any([
+            request.POST.get('old_password'),
+            request.POST.get('new_password1'),
+            request.POST.get('new_password2'),
+        ])
+        password_valid = password_form.is_valid() if password_fields_filled else True
 
         if user_valid:
             user_form.save()
-        
-        if password_valid:
-            user = password_form.save()
-            #パスワード変更後にログアウトされるのを防ぐ
-            update_session_auth_hash(request, user)
-        if not user_valid and not password_valid:
-            messages.error(request, '入力内容に誤りがあります。確認してください')
 
-        # どちらも成功していたら「student_settings」へリダイレクト
-        if user_valid and password_valid:
+        if password_fields_filled and password_valid:
+            user = password_form.save()
+            update_session_auth_hash(request, user)
+
+        if not user_valid or (password_fields_filled and not password_valid):
+            messages.error(request, '入力内容に誤りがあります。確認してください')
+        else:
             messages.success(request, 'ユーザー情報を更新しました')
             return redirect('student_setting')
         

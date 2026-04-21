@@ -57,7 +57,7 @@ def instructor_dashboard_view(request):
         reservation_data.append({
             'student_name': student.username,
             'lesson_date': detail.lesson_date,
-            'time_slot': detail.get_time_slot_display(),
+            'time_slot': detail.time_slot_display_ja,
         })
 
     return render(
@@ -188,9 +188,8 @@ def lesson_confirm_view(request, lesson_id):
 def lesson_reserve_view(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
-    # ログインユーザーが受講者かどうか確認（念のため）
-    if request.user.role != 'student':
-        return redirect('lesson_search')  # インストラクターは予約できない
+    if not request.user.is_student:
+        return error_response(request, '受講者のみ予約できます。')
 
     # 重複予約チェック
     if LessonPreference.objects.filter(student=request.user, lesson_detail=lesson).exists():
