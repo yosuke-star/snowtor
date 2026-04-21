@@ -8,6 +8,7 @@ urlpatterns = [
     path('signup/student/', views.student_signup_view, name="student_signup"),
     path('signup/instructor/', views.instructor_signup_view, name="instructor_signup"),
     # ログイン処理 - 受講者 - インストラクター
+    path('login/', views.login_select_view, name="login_select"),
     path('login/student/', views.student_login_view, name="student_login"),
     path('login/instructor/', views.instructor_login_view, name="instructor_login"),
     # ログアウト

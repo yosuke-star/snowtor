@@ -10,6 +10,9 @@ from django.http import HttpResponse
 def health_check(request):
     return HttpResponse("OK", status=200)
 
+def login_select_view(request):
+    return render(request, 'accounts_app/login_select.html')
+
 # 新規登録処理 受講者用
 def student_signup_view(request):
 
