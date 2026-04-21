@@ -129,7 +129,6 @@ class InstructorSignupForm(UserCreationForm):
             'date_of_birth': '例 : 1990-01-01',
             'phone_number': '例 : 090-1234-5678',
             'email': '例 : your_email@example.com',
-            'password': 'パスワードを入力してください',
         }
 
         # UserCreationForm が生成する password1 と password2 のフィールドにも適用する
