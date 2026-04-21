@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>スノトラ | スキー・スノーボードレッスン予約</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/png">
+</head>
+<body class="flex flex-col min-h-screen bg-gray-100">
+
+    <!-- ヘッダー -->
+    <header class="bg-blue-100 px-4 py-3 flex items-center justify-between h-16 sm:h-20">
+        <img src="{% static 'images/logo.png' %}" class="h-32 sm:h-24 w-auto" alt="スノトラのロゴ画像です" />
+        <a href="{% url 'login_select' %}"
+           class="py-2 px-4 text-sm font-bold text-sky-600 border border-sky-600 rounded-md
+                  hover:bg-sky-50 transition duration-300">
+            ログイン
+        </a>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- ヒーローセクション -->
+        <section class="bg-blue-100 py-20 px-4 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-6 leading-tight">
+                スキー・スノーボードの<br>レッスンを、もっと手軽に。
+            </h1>
+            <p class="text-lg text-gray-600 mb-10 max-w-xl mx-auto">
+                スノトラは、インストラクターと受講者をつなぐレッスン予約マッチングサービスです。
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'student_signup' %}"
+                   class="py-3 px-8 text-base font-bold text-white bg-sky-600 rounded-md
+                          hover:bg-sky-700 transition duration-300 shadow-md">
+                    受講者として始める
+                </a>
+                <a href="{% url 'instructor_signup' %}"
+                   class="py-3 px-8 text-base font-bold text-sky-600 border-2 border-sky-600 rounded-md
+                          hover:bg-sky-50 transition duration-300 shadow-md">
+                    インストラクターとして始める
+                </a>
+            </div>
+        </section>
+
+        <!-- 特徴セクション -->
+        <section class="py-16 px-4 max-w-5xl mx-auto">
+            <h2 class="text-2xl font-extrabold text-center text-gray-800 mb-12">スノトラの特徴</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <div class="text-4xl mb-4">🎿</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">かんたん検索</h3>
+                    <p class="text-sm text-gray-600">日程・エリア・レベルから条件に合ったレッスンをすぐに見つけられます。</p>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <div class="text-4xl mb-4">📅</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">オンライン予約</h3>
+                    <p class="text-sm text-gray-600">紙の手続き不要。予約から決済まですべてオンラインで完結します。</p>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <div class="text-4xl mb-4">👨‍🏫</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">インストラクター管理</h3>
+                    <p class="text-sm text-gray-600">日程・料金・受講者の管理をまとめて行えます。業務効率化をサポート。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTAセクション -->
+        <section class="bg-sky-600 py-16 px-4 text-center">
+            <h2 class="text-2xl font-extrabold text-white mb-4">さっそく使ってみましょう</h2>
+            <p class="text-sky-100 mb-8">アカウント登録は無料です。</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'student_signup' %}"
+                   class="py-3 px-8 text-base font-bold text-sky-600 bg-white rounded-md
+                          hover:bg-sky-50 transition duration-300 shadow-md">
+                    受講者として登録
+                </a>
+                <a href="{% url 'instructor_signup' %}"
+                   class="py-3 px-8 text-base font-bold text-white border-2 border-white rounded-md
+                          hover:bg-sky-700 transition duration-300 shadow-md">
+                    インストラクターとして登録
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    {% include "common/footer.html" %}
+
+</body>
+</html>

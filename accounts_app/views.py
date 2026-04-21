@@ -13,6 +13,14 @@ from django.http import HttpResponse
 def health_check(request):
     return HttpResponse("OK", status=200)
 
+def top_view(request):
+    if request.user.is_authenticated:
+        if request.user.is_student:
+            return redirect('student_dashboard')
+        elif request.user.is_instructor:
+            return redirect('instructor_dashboard')
+    return render(request, 'top.html')
+
 def login_select_view(request):
     return render(request, 'accounts_app/login_select.html')
 
