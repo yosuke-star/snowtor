@@ -1,5 +1,8 @@
+import logging
 from accounts_app.utils import store_login_or_signup_origin_path
 from django.contrib import messages
+
+logger = logging.getLogger(__name__)
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
@@ -9,6 +12,14 @@ from django.http import HttpResponse
 
 def health_check(request):
     return HttpResponse("OK", status=200)
+
+def top_view(request):
+    if request.user.is_authenticated:
+        if request.user.is_student:
+            return redirect('student_dashboard')
+        elif request.user.is_instructor:
+            return redirect('instructor_dashboard')
+    return render(request, 'top.html')
 
 def login_select_view(request):
     return render(request, 'accounts_app/login_select.html')
@@ -75,7 +86,7 @@ def student_login_view(request):
                 login(request, user)
                 return redirect('student_dashboard')
             else:
-                print("ログイン失敗")
+                logger.warning(f"[LOGIN_FAILED] username={username}")
                 login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
     else:
         login_form = LoginForm()
@@ -99,7 +110,7 @@ def instructor_login_view(request):
                 login(request, user)
                 return redirect('instructor_dashboard')
             else:
-                print("ログイン失敗")
+                logger.warning(f"[LOGIN_FAILED] username={username}")
                 login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
     else:
         login_form = LoginForm()
