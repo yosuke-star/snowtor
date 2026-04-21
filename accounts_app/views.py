@@ -1,5 +1,8 @@
+import logging
 from accounts_app.utils import store_login_or_signup_origin_path
 from django.contrib import messages
+
+logger = logging.getLogger(__name__)
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
@@ -75,7 +78,7 @@ def student_login_view(request):
                 login(request, user)
                 return redirect('student_dashboard')
             else:
-                print("ログイン失敗")
+                logger.warning(f"[LOGIN_FAILED] username={username}")
                 login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
     else:
         login_form = LoginForm()
@@ -99,7 +102,7 @@ def instructor_login_view(request):
                 login(request, user)
                 return redirect('instructor_dashboard')
             else:
-                print("ログイン失敗")
+                logger.warning(f"[LOGIN_FAILED] username={username}")
                 login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
     else:
         login_form = LoginForm()
