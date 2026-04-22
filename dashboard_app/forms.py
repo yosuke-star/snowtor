@@ -102,49 +102,66 @@ class LessonDetailForm(forms.ModelForm):
 class LessonSearchForm(forms.Form):
     lesson_date = forms.DateField(
         label="レッスン日",
-        widget=forms.DateInput(attrs={'type': 'date', 'class': COMMON_INPUT_CLASS})
+        required=False,
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': COMMON_INPUT_CLASS + ' cursor-pointer [color-scheme:light]',
+            'onkeydown': 'return false',
+            'style': 'color: transparent;',
+            'onfocus': "this.style.color=''; document.getElementById('date-placeholder').style.display='none'",
+            'onblur': "if(!this.value){ this.style.color='transparent'; document.getElementById('date-placeholder').style.display='flex'; }",
+        })
     )
 
     prefecture = forms.ModelChoiceField(
         queryset=Prefecture.objects.all(),
         label="都道府県",
+        required=False,
         widget=forms.RadioSelect(attrs={'class': 'flex space-x-4'}),
         empty_label=None
     )
 
     ski_resort = forms.ModelChoiceField(
-        queryset=SkiResort.objects.none(),  # 選択された都道府県に応じて後で動的変更
+        queryset=SkiResort.objects.none(),
         label="スキー場",
+        required=False,
         widget=forms.RadioSelect(attrs={'class': 'flex space-x-4'})
     )
 
     activity_type = forms.ModelChoiceField(
         queryset=ActivityType.objects.all(),
-        label="アクティビティ",
-        widget=forms.RadioSelect(attrs={'class': 'flex space-x-4'}),
-        empty_label=None
+        label="アクティビティタイプ",
+        required=False,
+        empty_label="選んでください",
+        widget=forms.Select(attrs={'class': COMMON_INPUT_CLASS}),
     )
 
     level = forms.ChoiceField(
         choices=[('', '選んでください')] + list(LessonDetail._meta.get_field('level').choices),
         label="レベル",
+        required=False,
         widget=forms.Select(attrs={'class': COMMON_INPUT_CLASS})
     )
 
     lesson_type = forms.ChoiceField(
         choices=[('', '選んでください')] + list(LessonDetail._meta.get_field('lesson_type').choices),
         label="レッスン形態",
+        required=False,
         widget=forms.Select(attrs={'class': COMMON_INPUT_CLASS})
     )
 
     time_slot = forms.ChoiceField(
         choices=[('', '選んでください')] + list(LessonDetail._meta.get_field('time_slot').choices),
         label="時間帯",
+        required=False,
         widget=forms.Select(attrs={'class': COMMON_INPUT_CLASS})
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.label_suffix = ''
+
+        self.fields['prefecture'].choices = [('', '指定なし')] + list(self.fields['prefecture'].choices)
 
         if 'prefecture' in self.data:
             try:

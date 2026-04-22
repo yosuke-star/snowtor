@@ -5,19 +5,24 @@
 {% block content %}
 
 <h1 class="text-center text-2xl sm:text-3xl font-extrabold text-gray-800 mt-2 mb-6 sm:mb-8">レッスンを探す</h1>
-
 <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-3xl">
     <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
         <form method="get" action="{% url 'lesson_search' %}" class="space-y-6">
             {% csrf_token %}
             <div>
                 {{ form.lesson_date.label_tag }}
-                {{ form.lesson_date }}
+                <div class="relative">
+                    {{ form.lesson_date }}
+                    <span id="date-placeholder"
+                            class="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none text-sm">
+                        レッスン日
+                    </span>
+                </div>
                 {% if form.lesson_date.errors %}
-                    <ul class="text-red-500 text-sm mt-1">
-                        {% for error in form.lesson_date.errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
+                    <ul class="errorlist text-red-500 text-sm mt-1">
+                    {% for error in form.lesson_date.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
                     </ul>
                 {% endif %}
             </div>
@@ -33,7 +38,7 @@
                         </label>
                     {% endfor %}
                 </div>
-            </div> 
+            </div>
             <!-- 非表示の ski_resort コンテナ -->
             <div id="ski-resort-container" style="display: none;">
                 <label for="id_ski_resort" class="block mb-2">スキー場</label>
@@ -41,17 +46,10 @@
                     <!-- JSでここにラジオボタンが挿入 -->
                 </div>
             </div>
-            <!-- 活動種別（スキー or スノーボード） -->
+
             <div>
                 {{ form.activity_type.label }}
-                <div class="flex flex-wrap gap-4 mt-2">
-                    {% for radio in form.activity_type %}
-                        <label class="flex items-center space-x-1">
-                            {{ radio.tag }}
-                            <span>{{ radio.choice_label }}</span>
-                        </label>
-                    {% endfor %}
-                </div>
+                {{ form.activity_type }}
             </div>
             <div>
                 {{ form.level.label }}
@@ -76,18 +74,39 @@
                     探す
                 </button>
             </div>
-            <!-- スクリプト -->
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
+                    // レッスン日のプレースホルダー制御
+                    const dateInput = document.getElementById('id_lesson_date');
+                    const datePlaceholder = document.getElementById('date-placeholder');
+
+                    function updateDatePlaceholder() {
+                        datePlaceholder.style.display = dateInput.value ? 'none' : 'flex';
+                    }
+                    dateInput.addEventListener('click', function () {
+                        this.showPicker();
+                    });
+                    dateInput.addEventListener('change', updateDatePlaceholder);
+                    updateDatePlaceholder();
+
+                    // 都道府県選択でスキー場を取得
                     const prefectureRadios = document.querySelectorAll('input[name="prefecture"]');
                     const skiResortContainer = document.getElementById('ski-resort-container');
                     const skiResortOptions = document.getElementById('ski-resort-options');
-                
+
                     prefectureRadios.forEach(radio => {
                         radio.addEventListener('change', function () {
                             const prefectureId = this.value;
+
+                            // 「指定なし」が選択された場合はスキー場を非表示
+                            if (!prefectureId) {
+                                skiResortContainer.style.display = 'none';
+                                skiResortOptions.innerHTML = '';
+                                return;
+                            }
+
                             const url = "{% url 'get_ski_resorts_search' %}?prefecture_id=" + prefectureId;
-                
+
                             fetch(url)
                                 .then(response => response.json())
                                 .then(data => {
@@ -101,12 +120,7 @@
                                         `;
                                     });
                                     skiResortOptions.innerHTML = html;
-                                    skiResortContainer.style.display = 'block';  // 表示！
-                                    skiResortContainer.classList.add('transition-opacity', 'duration-300', 'opacity-0');
-                                    setTimeout(() => {
-                                    skiResortContainer.classList.remove('opacity-0');
-                                    skiResortContainer.classList.add('opacity-100');
-                                    }, 10);
+                                    skiResortContainer.style.display = 'block';
                                 })
                                 .catch(error => {
                                     console.error('スキー場取得エラー:', error);
@@ -118,6 +132,7 @@
         </form>
     </div>
     <!--/.bg-white-->
+
     <!-- 検索結果 -->
     {% if lessons %}
         <div class="mt-10 bg-white p-6 rounded-lg shadow-md border border-gray-200">
@@ -141,14 +156,12 @@
                             <dt class="font-semibold text-gray-700">レッスン形態</dt>
                             <dd class="text-gray-900">{{ lesson.get_lesson_type_display }}</dd>
                             <dt class="font-semibold text-gray-700">時間帯</dt>
-                            <dd class="text-gray-900">{{ lesson.get_time_slot_display }}</dd>
+                            <dd class="text-gray-900">{{ lesson.time_slot_display_ja }}</dd>
                             <dt class="font-semibold text-gray-700">担当インストラクター</dt>
                             <dd class="text-gray-900">{{ lesson.instructor.username }}</dd>
                             <dt class="font-semibold text-gray-700">料金</dt>
                             <dd class="text-gray-900">¥ {{ lesson.price|intcomma }}</dd>
                         </dl>
-
-                        <!--予約ボタン-->
                         <div class="flex justify-end mt-4">
                             <form method="POST" action="{% url 'lesson_confirm' lesson.id %}">
                                 {% csrf_token %}
@@ -172,4 +185,3 @@
 </div>
 <!--/.container-->
 {% endblock %}
-
