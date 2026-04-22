@@ -27,3 +27,15 @@ shell:
 
 collectstatic:
 	$(COMPOSE) exec web python3 manage.py collectstatic --noinput
+
+loaddata:
+	$(COMPOSE) exec web python3 manage.py loaddata prefectures
+	$(COMPOSE) exec web python3 manage.py loaddata activity_types
+	$(COMPOSE) exec web python3 manage.py loaddata ski_resorts
+
+setup:
+	$(COMPOSE) up -d
+	$(COMPOSE) exec web python3 manage.py migrate
+	$(COMPOSE) exec web python3 manage.py loaddata prefectures
+	$(COMPOSE) exec web python3 manage.py loaddata activity_types
+	$(COMPOSE) exec web python3 manage.py loaddata ski_resorts
