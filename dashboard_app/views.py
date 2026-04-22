@@ -140,27 +140,26 @@ def lesson_search(request):
     lessons = LessonDetail.objects.none()  # デフォルトは空
 
     if form.is_valid():
-        # フォームの入力から検索条件を取得
-        lesson_date = form.cleaned_data['lesson_date']
-        prefecture = form.cleaned_data['prefecture']
-        ski_resort = form.cleaned_data['ski_resort']
-        activity_type = form.cleaned_data['activity_type']
-        level = form.cleaned_data['level']
-        lesson_type = form.cleaned_data['lesson_type']
-        time_slot = form.cleaned_data['time_slot']
-
-        # 厳密一致でフィルター
         lessons = LessonDetail.objects.select_related(
             "activity_type", "instructor", "prefecture", "ski_resort"
-        ).filter(
-            lesson_date=lesson_date,
-            prefecture=prefecture,
-            ski_resort=ski_resort,
-            activity_type=activity_type,
-            level=level,
-            lesson_type=lesson_type,
-            time_slot=time_slot,
         )
+
+        cd = form.cleaned_data
+        if cd.get('lesson_date'):
+            lessons = lessons.filter(lesson_date=cd['lesson_date'])
+        if cd.get('prefecture'):
+            lessons = lessons.filter(prefecture=cd['prefecture'])
+        if cd.get('ski_resort'):
+            lessons = lessons.filter(ski_resort=cd['ski_resort'])
+        if cd.get('activity_type'):
+            lessons = lessons.filter(activity_type=cd['activity_type'])
+        if cd.get('level'):
+            lessons = lessons.filter(level=cd['level'])
+        if cd.get('lesson_type'):
+            lessons = lessons.filter(lesson_type=cd['lesson_type'])
+        if cd.get('time_slot'):
+            lessons = lessons.filter(time_slot=cd['time_slot'])
+
         for lesson in lessons:
             lesson.price = get_lesson_price(lesson)
 
