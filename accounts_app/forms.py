@@ -46,111 +46,23 @@ def setup_date_field(form, field_name='date_of_birth'):
     form.fields[field_name].widget = DateInput(attrs={'type': 'date', 'class': COMMON_INPUT_CLASS})
     form.fields[field_name].label = '生年月日'
 
-# 新規登録処理 受講者側
-class StudentSignupForm(UserCreationForm):
+# 新規登録処理（受講者・インストラクター共通）
+class SignupForm(UserCreationForm):
     class Meta:
         model = get_user_model()
-        fields = [
-            'username',
-            'gender',
-            'date_of_birth',
-            'postal_code',
-            'address',
-            'phone_number',
-            'email',
-        ]
-
-        widgets = {
-            'gender': forms.RadioSelect,
-        }
+        fields = ['email']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # 「：」をなしにする
         self.label_suffix = ''
-        
-        field_settings = {
-            'username': '名前を入力してください',
-            'gender': '性別',
-            'date_of_birth': '例 : 1990-01-01',
-            'postal_code': '例 : 123-4567',
-            'address': '住所',
-            'phone_number': '例 : 090-1234-5678',
-            'email': '例 : your_email@example.com',
-        }
-
-        # UserCreationForm が生成する password1 と password2 のフィールドにも適用する
-        password_fields = {
+        apply_common_attrs(self, {
+            'email': 'メールアドレスを入力してください',
             'password1': 'パスワードを入力してください',
             'password2': 'パスワード(確認用)を入力してください',
-        }
-        
-        # 各フィールドに共通のCSSクラスとプレースホルダーを設定する
-        apply_common_attrs(self, field_settings)
-
-        # password1 と password2 にも適用する
-        apply_common_attrs(self, password_fields)
-        
-        self.fields['username'].label = '名前'
-        self.fields['postal_code'].label = '郵便番号'
-        self.fields['address'].label = '住所'
-        self.fields['phone_number'].label = '電話番号'
-        self.fields['email'].label = 'メール'
+        })
+        self.fields['email'].label = 'メールアドレス'
         self.fields['password1'].label = 'パスワード'
         self.fields['password2'].label = 'パスワード(確認用)'
-
-        setup_gender_field(self)
-        setup_date_field(self)
-
-# 新規登録処理 インストラクター側
-class InstructorSignupForm(UserCreationForm):
-    class Meta:
-        model = get_user_model()
-        fields = [
-            'username',
-            'gender',
-            'date_of_birth',
-            'phone_number',
-            'email',
-        ]
-
-        widgets = {
-            'gender': forms.RadioSelect,
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # 「：」をなしにする
-        self.label_suffix = ''
-        
-        field_settings = {
-            'username': '名前を入力してください',
-            'gender': '性別',
-            'date_of_birth': '例 : 1990-01-01',
-            'phone_number': '例 : 090-1234-5678',
-            'email': '例 : your_email@example.com',
-        }
-
-        # UserCreationForm が生成する password1 と password2 のフィールドにも適用する
-        password_fields = {
-            'password1': 'パスワードを入力してください',
-            'password2': 'パスワード(確認用)を入力してください',
-        }
-        
-        # 各フィールドに共通のCSSクラスとプレースホルダーを設定する
-        apply_common_attrs(self, field_settings)
-
-        # password1 と password2 にも適用する
-        apply_common_attrs(self, password_fields)
-        
-        self.fields['username'].label = '名前'
-        self.fields['phone_number'].label = '電話番号'
-        self.fields['email'].label = 'メール'
-        self.fields['password1'].label = 'パスワード'
-        self.fields['password2'].label = 'パスワード(確認用)'
-
-        setup_gender_field(self)
-        setup_date_field(self)
 
 # ログイン処理
 class LoginForm(forms.Form):
@@ -229,7 +141,7 @@ class UserUpdateForm(forms.ModelForm):
         apply_common_attrs(self, field_settings)
         
         self.fields['profile_image'].label = '画像'
-        self.fields['username'].label = '名前'
+        self.fields['username'].label = 'ニックネーム'
         self.fields['postal_code'].label = '郵便番号'
         self.fields['address'].label = '住所'
         self.fields['phone_number'].label = '電話番号'

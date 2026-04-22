@@ -13,9 +13,9 @@ class CustomUser(AbstractUser):
     last_name = None
 
     role = models.CharField(max_length=10, choices=Role.choices)
-    gender = models.CharField(max_length=1, choices=[('M', '男性'), ('F', '女性')], blank=False)
-    date_of_birth = models.DateField()
-    phone_number = models.CharField(max_length=20)
+    gender = models.CharField(max_length=1, choices=[('M', '男性'), ('F', '女性')], blank=True, default='')
+    date_of_birth = models.DateField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, default='')
     postal_code = models.CharField(max_length=10, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
