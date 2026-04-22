@@ -1,14 +1,15 @@
 import logging
+import uuid
 from accounts_app.utils import store_login_or_signup_origin_path
 from django.contrib import messages
-
-logger = logging.getLogger(__name__)
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from .forms import InstructorProfileForm, InstructorSignupForm, CustomPasswordChangeForm, LoginForm, StudentSignupForm, UserUpdateForm
+from .forms import InstructorProfileForm, SignupForm, CustomPasswordChangeForm, LoginForm, UserUpdateForm
 from .models import CustomUser, InstructorProfile
 from django.http import HttpResponse
+
+logger = logging.getLogger(__name__)
 
 def health_check(request):
     return HttpResponse("OK", status=200)
@@ -26,46 +27,34 @@ def login_select_view(request):
 
 # 新規登録処理 受講者用
 def student_signup_view(request):
-
     store_login_or_signup_origin_path(request)
-    # 新規登録フォームが送られてきた時
     if request.method == 'POST':
-        signup_form = StudentSignupForm(request.POST)
-
+        signup_form = SignupForm(request.POST)
         if signup_form.is_valid():
-            # ユーザーを保存して、'user' 変数に代入する
-            user = signup_form.save(commit=False) # 保存は確定させない
-            # ロールを設定する
+            user = signup_form.save(commit=False)
+            user.username = f"user_{uuid.uuid4().hex[:12]}"
             user.role = CustomUser.Role.STUDENT
-            # 変更を DB へ保存する
             user.save()
-            # ログイン処理
             login(request, user)
             return redirect('student_dashboard')
     else:
-        signup_form = StudentSignupForm()
+        signup_form = SignupForm()
     return render(request, 'accounts_app/student_signup.html', {'signup_form': signup_form})
 
 # 新規登録処理 インストラクター用
 def instructor_signup_view(request):
-
     store_login_or_signup_origin_path(request)
-    # 新規登録フォームが送られてきた時
     if request.method == 'POST':
-        signup_form = InstructorSignupForm(request.POST)
-
+        signup_form = SignupForm(request.POST)
         if signup_form.is_valid():
-            # ユーザーを保存して、'user' 変数に代入する
-            user = signup_form.save(commit=False) # 保存は確定させない
-            # ロールを設定する
+            user = signup_form.save(commit=False)
+            user.username = f"user_{uuid.uuid4().hex[:12]}"
             user.role = CustomUser.Role.INSTRUCTOR
-            # 変更を DB へ保存する
             user.save()
-            # ログイン処理
             login(request, user)
             return redirect('instructor_dashboard')
     else:
-        signup_form = InstructorSignupForm()
+        signup_form = SignupForm()
     return render(request, 'accounts_app/instructor_signup.html', {'signup_form': signup_form})
 
 # ログイン処理 - 受講者側
