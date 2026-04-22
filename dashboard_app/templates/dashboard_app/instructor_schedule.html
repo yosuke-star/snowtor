@@ -4,7 +4,6 @@
 {% block content %}
 
 <h1 class="text-center text-2xl sm:text-3xl font-extrabold text-gray-800 mt-2 mb-6 sm:mb-8">レッスン詳細編集</h1>
-<p class="text-center text-base sm:text-xl text-gray-800 mb-6 sm:mb-8">レッスン情報を入力してください</p>
 
 <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-3xl">
     <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
@@ -12,7 +11,13 @@
             {% csrf_token %}
             <div>
                 {{ form.lesson_date.label_tag }}
-                {{ form.lesson_date }}
+                <div class="relative">
+                    {{ form.lesson_date }}
+                    <span id="date-placeholder"
+                            class="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none text-sm">
+                        レッスン日
+                    </span>
+                </div>
                 {% if form.lesson_date.errors %}
                     <ul class="errorlist text-red-500 text-sm mt-1">
                     {% for error in form.lesson_date.errors %}
@@ -62,27 +67,27 @@
                 {{ form.time_slot.label }}
                 {{ form.time_slot }}
             </div>
-            <div>
+            <div id="price-ski-morning" style="display:none;">
                 {{ form.ski_morning_price.label }}
                 {{ form.ski_morning_price }}
             </div>
-            <div>
+            <div id="price-ski-afternoon" style="display:none;">
                 {{ form.ski_afternoon_price.label }}
                 {{ form.ski_afternoon_price }}
             </div>
-            <div>
+            <div id="price-ski-full-day" style="display:none;">
                 {{ form.ski_full_day_price.label }}
                 {{ form.ski_full_day_price }}
             </div>
-            <div>
+            <div id="price-snowboard-morning" style="display:none;">
                 {{ form.snowboard_morning_price.label }}
                 {{ form.snowboard_morning_price }}
             </div>
-            <div>
+            <div id="price-snowboard-afternoon" style="display:none;">
                 {{ form.snowboard_afternoon_price.label }}
                 {{ form.snowboard_afternoon_price }}
             </div>
-            <div>
+            <div id="price-snowboard-full-day" style="display:none;">
                 {{ form.snowboard_full_day_price.label }}
                 {{ form.snowboard_full_day_price }}
             </div>
@@ -99,6 +104,52 @@
             <!-- スクリプト：都道府県選択でスキー場を取得＆表示 -->
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
+                    // レッスン日のプレースホルダー制御
+                    const dateInput = document.getElementById('id_lesson_date');
+                    const datePlaceholder = document.getElementById('date-placeholder');
+
+                    function updateDatePlaceholder() {
+                        datePlaceholder.style.display = dateInput.value ? 'none' : 'flex';
+                    }
+                    dateInput.addEventListener('click', function () {
+                        this.showPicker();
+                    });
+                    dateInput.addEventListener('change', updateDatePlaceholder);
+                    updateDatePlaceholder();
+
+                    // 料金フィールドの表示制御
+                    const activitySelect = document.getElementById('id_activity_type');
+                    const timeSlotSelect = document.getElementById('id_time_slot');
+
+                    const priceFields = {
+                        ski:        { morning: 'price-ski-morning', afternoon: 'price-ski-afternoon', full_day: 'price-ski-full-day' },
+                        snowboard:  { morning: 'price-snowboard-morning', afternoon: 'price-snowboard-afternoon', full_day: 'price-snowboard-full-day' },
+                    };
+
+                    // ActivityType の pk をテキストで判定（fixture: 1=スキー, 2=スノーボード）
+                    const activityMap = { '1': 'ski', '2': 'snowboard' };
+
+                    function updatePriceFields() {
+                        const activity = activityMap[activitySelect.value];
+                        const slot = timeSlotSelect.value;
+
+                        // 全て非表示
+                        Object.values(priceFields).forEach(slots =>
+                            Object.values(slots).forEach(id => {
+                                document.getElementById(id).style.display = 'none';
+                            })
+                        );
+
+                        // 該当する1フィールドだけ表示
+                        if (activity && slot && priceFields[activity]?.[slot]) {
+                            document.getElementById(priceFields[activity][slot]).style.display = 'block';
+                        }
+                    }
+
+                    activitySelect.addEventListener('change', updatePriceFields);
+                    timeSlotSelect.addEventListener('change', updatePriceFields);
+                    updatePriceFields();
+
                     const prefectureRadios = document.querySelectorAll('input[name="prefecture"]');
                     const skiResortContainer = document.getElementById('ski-resort-container');
                     const skiResortOptions = document.getElementById('ski-resort-options');

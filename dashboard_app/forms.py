@@ -43,7 +43,11 @@ class LessonDetailForm(forms.ModelForm):
         widgets = {
             'lesson_date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': COMMON_INPUT_CLASS
+                'class': COMMON_INPUT_CLASS + ' cursor-pointer [color-scheme:light]',
+                'onkeydown': 'return false',
+                'style': 'color: transparent;',
+                'onfocus': "this.style.color=''; document.getElementById('date-placeholder').style.display='none'",
+                'onblur': "if(!this.value){ this.style.color='transparent'; document.getElementById('date-placeholder').style.display='flex'; }",
             }),
         }
 
