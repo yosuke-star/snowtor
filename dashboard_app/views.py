@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models import Count
 from django.views.decorators.http import require_POST
 from .forms import LessonDetailForm, LessonSearchForm
 from accounts_app.models import InstructorProfile
@@ -161,6 +162,8 @@ def lesson_search(request):
         today = timezone.localtime().date()
         lessons = LessonDetail.objects.select_related(
             "activity_type", "instructor", "prefecture", "ski_resort"
+        ).annotate(
+            reserved_count=Count('lessonpreference')
         ).filter(lesson_date__gte=today)
 
         cd = form.cleaned_data
@@ -181,8 +184,7 @@ def lesson_search(request):
 
         for lesson in lessons:
             lesson.price = get_lesson_price(lesson)
-            reserved_count = LessonPreference.objects.filter(lesson_detail=lesson).count()
-            lesson.is_full = reserved_count >= lesson.max_students
+            lesson.is_full = lesson.reserved_count >= lesson.max_students
 
     return render(
         request,
