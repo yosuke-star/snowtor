@@ -105,7 +105,7 @@
                                 return;
                             }
 
-                            const url = "{% url 'get_ski_resorts_search' %}?prefecture_id=" + prefectureId;
+                            const url = "{% url 'get_ski_resorts' %}?prefecture_id=" + prefectureId;
 
                             fetch(url)
                                 .then(response => response.json())
@@ -141,7 +141,14 @@
             </h2>
             <div class="space-y-4">
                 {% for lesson in lessons %}
-                    <div class="p-4 border rounded shadow-sm">
+                    <div class="p-4 border rounded shadow-sm {% if lesson.is_full %}opacity-60{% endif %}">
+                        {% if lesson.is_full %}
+                        <div class="mb-3">
+                            <span class="inline-block px-3 py-1 bg-gray-500 text-white text-xs font-bold rounded-full tracking-widest">
+                                SOLD OUT
+                            </span>
+                        </div>
+                        {% endif %}
                         <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                             <dt class="font-semibold text-gray-700">レッスン日</dt>
                             <dd class="text-gray-900">{{ lesson.lesson_date|date:"Y年m月d日" }}</dd>
@@ -158,19 +165,27 @@
                             <dt class="font-semibold text-gray-700">時間帯</dt>
                             <dd class="text-gray-900">{{ lesson.time_slot_display_ja }}</dd>
                             <dt class="font-semibold text-gray-700">担当インストラクター</dt>
-                            <dd class="text-gray-900">{{ lesson.instructor.username }}</dd>
+                            <dd class="text-gray-900">
+                                <a href="{% url 'instructor_profile' lesson.instructor.id %}"
+                                   class="text-sky-600 hover:underline">
+                                    {{ lesson.instructor.username }}
+                                </a>
+                            </dd>
                             <dt class="font-semibold text-gray-700">料金</dt>
                             <dd class="text-gray-900">¥ {{ lesson.price|intcomma }}</dd>
                         </dl>
                         <div class="flex justify-end mt-4">
-                            <form method="POST" action="{% url 'lesson_confirm' lesson.id %}">
-                                {% csrf_token %}
-                                <button type="submit"
-                                    class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                                    aria-label="このレッスンを予約する">
-                                    このレッスンを予約する
+                            {% if lesson.is_full %}
+                                <button type="button" disabled
+                                    class="px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed">
+                                    予約できません
                                 </button>
-                            </form>
+                            {% else %}
+                                <a href="{% url 'lesson_confirm' lesson.id %}"
+                                    class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 inline-block">
+                                    このレッスンを確認する
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}

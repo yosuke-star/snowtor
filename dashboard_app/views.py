@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .forms import LessonDetailForm, LessonSearchForm
+from accounts_app.models import InstructorProfile
 from .models import ActivityChoices, LessonDetail, LessonPreference, SkiResort
 import stripe
 
@@ -69,22 +70,37 @@ def instructor_dashboard_view(request):
         }
     )
 
+def _is_profile_complete(user):
+    """プロフィールの必須項目（自己紹介・種目いずれか）が入力済みか確認する。"""
+    try:
+        profile = user.instructor_profile
+    except InstructorProfile.DoesNotExist:
+        return False
+    return bool(profile.self_introduction) and (profile.skill_ski or profile.skill_snowboard)
+
 @login_required
 def instructor_schedule(request):
     if not request.user.is_instructor:
         return error_response(request, 'インストラクターのみアクセス可能です。')
 
+    profile_complete = _is_profile_complete(request.user)
+
     if request.method == 'POST':
+        if not profile_complete:
+            return error_response(request, 'レッスンを登録するには、先にプロフィールを入力してください。', status=403)
         form = LessonDetailForm(request.POST)
         if form.is_valid():
             lesson_detail = form.save(commit=False)
             lesson_detail.instructor = request.user
             lesson_detail.save()
-            return redirect('instructor_schedule')  # 登録後リダイレクト
+            return redirect('instructor_schedule')
     else:
         form = LessonDetailForm()
 
-    return render(request, 'dashboard_app/instructor_schedule.html', {'form': form})
+    return render(request, 'dashboard_app/instructor_schedule.html', {
+        'form': form,
+        'profile_complete': profile_complete,
+    })
 
 # フロントの都道府県選択に応じて対応するスキー場を返すAjaxエンドポイント
 @login_required
@@ -136,13 +152,17 @@ def instructor_events(request):
 # 受講者側がインストラクターのレッスン状況を取得する
 @login_required
 def lesson_search(request):
+    if not request.user.is_student:
+        return error_response(request, '受講者のみアクセス可能です。')
+
     form = LessonSearchForm(request.GET or None)
     lessons = LessonDetail.objects.none()  # デフォルトは空
 
     if form.is_valid():
+        today = timezone.localtime().date()
         lessons = LessonDetail.objects.select_related(
             "activity_type", "instructor", "prefecture", "ski_resort"
-        )
+        ).filter(lesson_date__gte=today)
 
         cd = form.cleaned_data
         if cd.get('lesson_date'):
@@ -162,6 +182,8 @@ def lesson_search(request):
 
         for lesson in lessons:
             lesson.price = get_lesson_price(lesson)
+            reserved_count = LessonPreference.objects.filter(lesson_detail=lesson).count()
+            lesson.is_full = reserved_count >= lesson.max_students
 
     return render(
         request,
