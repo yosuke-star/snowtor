@@ -11,8 +11,8 @@
             {% csrf_token %}
 
             <div>
-                {{ login_form.username.label_tag}}
-                {{ login_form.username }}
+                {{ login_form.email.label_tag}}
+                {{ login_form.email }}
             </div>
             <div>
                 {{ login_form.password.label_tag}}
@@ -37,6 +37,11 @@
                 </a>
             </div>
         </form>
+        <div class="text-center mt-4">
+            <a href="{% url 'password_reset' %}" class="text-sm text-sky-600 hover:underline">
+                パスワードをお忘れの方はこちら
+            </a>
+        </div>
     </div>
     <!-- /. bg-white-->
 </div>

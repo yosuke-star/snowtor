@@ -4,7 +4,10 @@ from accounts_app.utils import store_login_or_signup_origin_path
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.core import signing
+from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from .forms import InstructorProfileForm, SignupForm, CustomPasswordChangeForm, LoginForm, UserUpdateForm
 from .models import CustomUser, InstructorProfile
 from django.http import HttpResponse
@@ -25,6 +28,19 @@ def top_view(request):
 def login_select_view(request):
     return render(request, 'accounts_app/login_select.html')
 
+def _send_activation_email(request, user):
+    token = signing.dumps({'user_id': user.pk}, salt='email-activation')
+    activation_url = request.build_absolute_uri(f'/activate/{token}/')
+    body = render_to_string('accounts_app/activation_email.txt', {
+        'activation_url': activation_url,
+    })
+    send_mail(
+        subject='【スノトラ】メールアドレスの確認',
+        message=body,
+        from_email=None,
+        recipient_list=[user.email],
+    )
+
 # 新規登録処理 受講者用
 def student_signup_view(request):
     store_login_or_signup_origin_path(request)
@@ -34,9 +50,10 @@ def student_signup_view(request):
             user = signup_form.save(commit=False)
             user.username = f"user_{uuid.uuid4().hex[:12]}"
             user.role = CustomUser.Role.STUDENT
+            user.is_active = False
             user.save()
-            login(request, user)
-            return redirect('student_dashboard')
+            _send_activation_email(request, user)
+            return redirect('signup_done')
     else:
         signup_form = SignupForm()
     return render(request, 'accounts_app/student_signup.html', {'signup_form': signup_form})
@@ -50,57 +67,77 @@ def instructor_signup_view(request):
             user = signup_form.save(commit=False)
             user.username = f"user_{uuid.uuid4().hex[:12]}"
             user.role = CustomUser.Role.INSTRUCTOR
+            user.is_active = False
             user.save()
-            login(request, user)
-            return redirect('instructor_dashboard')
+            _send_activation_email(request, user)
+            return redirect('signup_done')
     else:
         signup_form = SignupForm()
     return render(request, 'accounts_app/instructor_signup.html', {'signup_form': signup_form})
 
+def signup_done_view(request):
+    return render(request, 'accounts_app/signup_done.html')
+
+def activate_view(request, token):
+    try:
+        data = signing.loads(token, salt='email-activation', max_age=86400)
+        user = CustomUser.objects.get(pk=data['user_id'])
+    except (signing.BadSignature, signing.SignatureExpired, CustomUser.DoesNotExist):
+        return render(request, 'accounts_app/activation_invalid.html')
+
+    if not user.is_active:
+        user.is_active = True
+        user.save()
+    return render(request, 'accounts_app/activation_done.html')
+
+def _authenticate_by_email(request, email, password):
+    """メールアドレスでユーザーを検索し認証する。"""
+    try:
+        user = CustomUser.objects.get(email=email)
+    except CustomUser.DoesNotExist:
+        return None, None
+    return authenticate(request, username=user.username, password=password), user
+
 # ログイン処理 - 受講者側
 def student_login_view(request):
-
     store_login_or_signup_origin_path(request)
-    # ログインフォームが送られてきた時
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
-
         if login_form.is_valid():
-            username = login_form.cleaned_data['username']
+            email = login_form.cleaned_data['email']
             password = login_form.cleaned_data['password']
-            # 認証処理
-            user = authenticate(request, username=username, password=password)
-
+            user, db_user = _authenticate_by_email(request, email, password)
             if user is not None:
                 login(request, user)
                 return redirect('student_dashboard')
             else:
-                logger.warning(f"[LOGIN_FAILED] username={username}")
-                login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
+                logger.warning(f"[LOGIN_FAILED] email={email}")
+                if db_user and not db_user.is_active:
+                    login_form.add_error(None, 'メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。')
+                else:
+                    login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
     else:
         login_form = LoginForm()
     return render(request, 'accounts_app/student_login.html', {'login_form': login_form})
 
 # ログイン処理 - インストラクター側
 def instructor_login_view(request):
-    
     store_login_or_signup_origin_path(request)
-    # ログインフォームが送られてきた時
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
-
         if login_form.is_valid():
-            username = login_form.cleaned_data['username']
+            email = login_form.cleaned_data['email']
             password = login_form.cleaned_data['password']
-            # 認証処理
-            user = authenticate(request, username=username, password=password)
-
+            user, db_user = _authenticate_by_email(request, email, password)
             if user is not None:
                 login(request, user)
                 return redirect('instructor_dashboard')
             else:
-                logger.warning(f"[LOGIN_FAILED] username={username}")
-                login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
+                logger.warning(f"[LOGIN_FAILED] email={email}")
+                if db_user and not db_user.is_active:
+                    login_form.add_error(None, 'メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。')
+                else:
+                    login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
     else:
         login_form = LoginForm()
     return render(request, 'accounts_app/instructor_login.html', {'login_form': login_form})
