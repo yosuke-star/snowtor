@@ -166,7 +166,7 @@
                     prefectureRadios.forEach(radio => {
                         radio.addEventListener('change', function () {
                             const prefectureId = this.value;
-                            const url = "{% url 'get_ski_resorts_instructor' %}?prefecture_id=" + prefectureId;
+                            const url = "{% url 'get_ski_resorts' %}?prefecture_id=" + prefectureId;
                 
                             fetch(url)
                                 .then(response => response.json())

@@ -11,8 +11,7 @@ urlpatterns = [
     path('search/', views.lesson_search, name='lesson_search'),
 
     # Ajax - スキー場取得
-    path('search/get-ski-resorts/', views.get_ski_resorts, name="get_ski_resorts_search"),
-    path('instructor/schedule/get-ski-resorts/', views.get_ski_resorts, name="get_ski_resorts_instructor"),
+    path('get-ski-resorts/', views.get_ski_resorts, name="get_ski_resorts"),
 
     # カレンダーイベント取得
     path('instructor/events/', views.instructor_events, name='instructor_events'),
