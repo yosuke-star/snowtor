@@ -1,0 +1,19 @@
+{% extends 'accounts_app/base.html' %}
+{% block title %}確認メールを送信しました | スノトラ{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-md">
+    <h1 class="text-center text-3xl font-extrabold text-gray-800 mb-4">確認メールを送信しました</h1>
+    <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200 text-center space-y-4">
+        <p class="text-gray-700">
+            ご登録のメールアドレスに確認メールをお送りしました。
+        </p>
+        <p class="text-gray-700">
+            メール内のリンクをクリックして、登録を完了してください。
+        </p>
+        <p class="text-sm text-gray-500">
+            メールが届かない場合は、迷惑メールフォルダをご確認ください。
+        </p>
+    </div>
+</div>
+{% endblock %}

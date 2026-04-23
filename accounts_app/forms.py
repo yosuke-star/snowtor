@@ -66,11 +66,11 @@ class SignupForm(UserCreationForm):
 
 # ログイン処理
 class LoginForm(forms.Form):
-    username = forms.CharField(
-        label='名前',
-        widget=forms.TextInput(attrs={
+    email = forms.EmailField(
+        label='メールアドレス',
+        widget=forms.EmailInput(attrs={
             'class': COMMON_INPUT_CLASS,
-            'placeholder': '名前を入力してください'
+            'placeholder': 'メールアドレスを入力してください'
         })
     )
     password = forms.CharField(
@@ -84,23 +84,6 @@ class LoginForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ''
-        self.user = None
-
-    def clean(self):
-        cleaned_data = super().clean()
-        username = cleaned_data.get("username")
-        password = cleaned_data.get("password")
-
-        if username and password:
-            self.user = authenticate(username=username, password=password)
-
-            if self.user is None:
-                raise forms.ValidationError("名前またはパスワードが正しくありません。")
-
-        return cleaned_data
-
-    def get_user(self):
-        return self.user
 
 # 編集処理
 class UserUpdateForm(forms.ModelForm):
