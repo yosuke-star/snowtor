@@ -156,9 +156,10 @@ def lesson_search(request):
     lessons = LessonDetail.objects.none()  # デフォルトは空
 
     if form.is_valid():
+        today = timezone.localtime().date()
         lessons = LessonDetail.objects.select_related(
             "activity_type", "instructor", "prefecture", "ski_resort"
-        )
+        ).filter(lesson_date__gte=today)
 
         cd = form.cleaned_data
         if cd.get('lesson_date'):
@@ -178,6 +179,8 @@ def lesson_search(request):
 
         for lesson in lessons:
             lesson.price = get_lesson_price(lesson)
+            reserved_count = LessonPreference.objects.filter(lesson_detail=lesson).count()
+            lesson.is_full = reserved_count >= lesson.max_students
 
     return render(
         request,
