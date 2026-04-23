@@ -1,0 +1,21 @@
+{% extends 'accounts_app/base.html' %}
+{% block title %}リンクが無効です | スノトラ{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-md">
+    <h1 class="text-center text-3xl font-extrabold text-gray-800 mb-4">リンクが無効です</h1>
+    <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200 text-center space-y-4">
+        <p class="text-red-500">
+            このリンクは無効または有効期限切れです。
+        </p>
+        <p class="text-sm text-gray-500">
+            再度サインアップするか、お問い合わせください。
+        </p>
+    </div>
+    <div class="text-center mt-6">
+        <a href="{% url 'login_select' %}" class="text-sm text-sky-600 hover:underline">
+            ログインページへ戻る
+        </a>
+    </div>
+</div>
+{% endblock %}

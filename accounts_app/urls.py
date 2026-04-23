@@ -18,6 +18,10 @@ urlpatterns = [
     # ユーザー設定 - 受講者 - インストラクター
     path('student_setting/', views.student_setting, name="student_setting"),
     path('instructor_setting/', views.instructor_setting, name="instructor_setting"),
+    # メール認証
+    path('signup/done/', views.signup_done_view, name='signup_done'),
+    path('activate/<str:token>/', views.activate_view, name='activate'),
+
     # パスワードリセット
     path('password-reset/', auth_views.PasswordResetView.as_view(
         template_name='accounts_app/password_reset.html',
