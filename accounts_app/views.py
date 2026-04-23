@@ -231,30 +231,30 @@ def instructor_setting(request):
 
     # 「更新ボタン」が押された時
     if request.method == 'POST':
-        # フォームのインスタンス化(POSTデータと既存のインスタンスを紐付け)
         user_form = UserUpdateForm(request.POST, instance=request.user)
         password_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
         instructor_profile_form = InstructorProfileForm(request.POST, instance=instructor_profile)
 
-        # 各フォームのバリデーション結果
         user_valid = user_form.is_valid()
-        password_valid = password_form.is_valid()
         instructor_profile_valid = instructor_profile_form.is_valid()
 
-        # 全てのフォームが有効であれば保存処理をする
+        password_fields_filled = any([
+            request.POST.get('old_password'),
+            request.POST.get('new_password1'),
+            request.POST.get('new_password2'),
+        ])
+        password_valid = password_form.is_valid() if password_fields_filled else True
+
         if user_valid and password_valid and instructor_profile_valid:
             user_form.save()
-            password_form.save()
             instructor_profile_form.save()
-
-            #パスワード変更後にログアウトされるのを防ぐ
-            update_session_auth_hash(request, password_form.user)
+            if password_fields_filled:
+                password_form.save()
+                update_session_auth_hash(request, password_form.user)
             messages.success(request, 'ユーザー情報を更新しました')
             return redirect('instructor_setting')
         else:
-            # フォームのどこかにエラーがあればメッセージを表示させる
             messages.error(request, '入力内容に誤りがあります。確認してください')
-            # エラーがある場合でも、フォームインスタンスを渡してエラーメッセージを表示させる
             params = {
                 'user_form': user_form,
                 'password_form': password_form,
