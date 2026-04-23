@@ -152,6 +152,9 @@ def instructor_events(request):
 # 受講者側がインストラクターのレッスン状況を取得する
 @login_required
 def lesson_search(request):
+    if not request.user.is_student:
+        return error_response(request, '受講者のみアクセス可能です。')
+
     form = LessonSearchForm(request.GET or None)
     lessons = LessonDetail.objects.none()  # デフォルトは空
 
