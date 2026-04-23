@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .forms import LessonDetailForm, LessonSearchForm
+from accounts_app.models import InstructorProfile
 from .models import ActivityChoices, LessonDetail, LessonPreference, SkiResort
 import stripe
 
@@ -69,22 +70,37 @@ def instructor_dashboard_view(request):
         }
     )
 
+def _is_profile_complete(user):
+    """プロフィールの必須項目（自己紹介・種目いずれか）が入力済みか確認する。"""
+    try:
+        profile = user.instructor_profile
+    except InstructorProfile.DoesNotExist:
+        return False
+    return bool(profile.self_introduction) and (profile.skill_ski or profile.skill_snowboard)
+
 @login_required
 def instructor_schedule(request):
     if not request.user.is_instructor:
         return error_response(request, 'インストラクターのみアクセス可能です。')
 
+    profile_complete = _is_profile_complete(request.user)
+
     if request.method == 'POST':
+        if not profile_complete:
+            return error_response(request, 'レッスンを登録するには、先にプロフィールを入力してください。', status=403)
         form = LessonDetailForm(request.POST)
         if form.is_valid():
             lesson_detail = form.save(commit=False)
             lesson_detail.instructor = request.user
             lesson_detail.save()
-            return redirect('instructor_schedule')  # 登録後リダイレクト
+            return redirect('instructor_schedule')
     else:
         form = LessonDetailForm()
 
-    return render(request, 'dashboard_app/instructor_schedule.html', {'form': form})
+    return render(request, 'dashboard_app/instructor_schedule.html', {
+        'form': form,
+        'profile_complete': profile_complete,
+    })
 
 # フロントの都道府県選択に応じて対応するスキー場を返すAjaxエンドポイント
 @login_required

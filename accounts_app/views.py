@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.mail import send_mail
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from .forms import InstructorProfileForm, SignupForm, CustomPasswordChangeForm, LoginForm, UserUpdateForm
 from .models import CustomUser, InstructorProfile
@@ -74,6 +74,19 @@ def instructor_signup_view(request):
     else:
         signup_form = SignupForm()
     return render(request, 'accounts_app/instructor_signup.html', {'signup_form': signup_form})
+
+def instructor_profile_view(request, user_id):
+    instructor = get_object_or_404(CustomUser, id=user_id, role=CustomUser.Role.INSTRUCTOR)
+    try:
+        profile = instructor.instructor_profile
+    except InstructorProfile.DoesNotExist:
+        profile = None
+    back_url = request.META.get('HTTP_REFERER', '/')
+    return render(request, 'accounts_app/instructor_profile.html', {
+        'instructor': instructor,
+        'profile': profile,
+        'back_url': back_url,
+    })
 
 def signup_done_view(request):
     return render(request, 'accounts_app/signup_done.html')

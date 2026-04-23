@@ -18,6 +18,9 @@ urlpatterns = [
     # ユーザー設定 - 受講者 - インストラクター
     path('student_setting/', views.student_setting, name="student_setting"),
     path('instructor_setting/', views.instructor_setting, name="instructor_setting"),
+    # インストラクタープロフィール（公開）
+    path('instructor/<int:user_id>/profile/', views.instructor_profile_view, name='instructor_profile'),
+
     # メール認証
     path('signup/done/', views.signup_done_view, name='signup_done'),
     path('activate/<str:token>/', views.activate_view, name='activate'),
