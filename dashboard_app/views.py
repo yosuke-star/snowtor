@@ -5,7 +5,6 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .forms import LessonDetailForm, LessonSearchForm
 from accounts_app.models import InstructorProfile
@@ -196,6 +195,9 @@ def lesson_search(request):
 
 @login_required
 def lesson_confirm_view(request, lesson_id):
+    if not request.user.is_student:
+        return error_response(request, '受講者のみアクセス可能です。')
+
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
     lesson.price = get_lesson_price(lesson)
 
@@ -304,6 +306,7 @@ def cancel_preference(request, pref_id):
     return redirect('instructor_history')
 
 @login_required
+@require_POST
 def cancel_lesson(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
@@ -317,7 +320,6 @@ def cancel_lesson(request, lesson_id):
     return redirect('instructor_history')
 
 @login_required
-@csrf_exempt
 def create_checkout_session(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
