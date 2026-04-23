@@ -158,7 +158,12 @@
                             <dt class="font-semibold text-gray-700">時間帯</dt>
                             <dd class="text-gray-900">{{ lesson.time_slot_display_ja }}</dd>
                             <dt class="font-semibold text-gray-700">担当インストラクター</dt>
-                            <dd class="text-gray-900">{{ lesson.instructor.username }}</dd>
+                            <dd class="text-gray-900">
+                                <a href="{% url 'instructor_profile' lesson.instructor.id %}"
+                                   class="text-sky-600 hover:underline">
+                                    {{ lesson.instructor.username }}
+                                </a>
+                            </dd>
                             <dt class="font-semibold text-gray-700">料金</dt>
                             <dd class="text-gray-900">¥ {{ lesson.price|intcomma }}</dd>
                         </dl>
