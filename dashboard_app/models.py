@@ -72,7 +72,11 @@ class LessonDetail(models.Model):
     @property
     def time_slot_display_ja(self):
         return dict(self.TIME_SLOT_CHOICES).get(self.time_slot, '未設定')
-    
+
+    @property
+    def is_at_capacity(self):
+        return self.lessonpreference_set.count() >= self.max_students
+
     def __str__(self):
         return f"{self.lesson_date} - {self.instructor.username}"
 

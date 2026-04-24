@@ -1,6 +1,6 @@
 import logging
 import uuid
-from accounts_app.utils import store_login_or_signup_origin_path
+from accounts_app.utils import store_login_or_signup_origin_path, is_password_fields_filled
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -41,39 +41,27 @@ def _send_activation_email(request, user):
         recipient_list=[user.email],
     )
 
-# 新規登録処理 受講者用
-def student_signup_view(request):
+def _signup_view(request, role, template_name):
     store_login_or_signup_origin_path(request)
     if request.method == 'POST':
         signup_form = SignupForm(request.POST)
         if signup_form.is_valid():
             user = signup_form.save(commit=False)
             user.username = f"user_{uuid.uuid4().hex[:12]}"
-            user.role = CustomUser.Role.STUDENT
+            user.role = role
             user.is_active = False
             user.save()
             _send_activation_email(request, user)
             return redirect('signup_done')
     else:
         signup_form = SignupForm()
-    return render(request, 'accounts_app/student_signup.html', {'signup_form': signup_form})
+    return render(request, template_name, {'signup_form': signup_form})
 
-# 新規登録処理 インストラクター用
+def student_signup_view(request):
+    return _signup_view(request, CustomUser.Role.STUDENT, 'accounts_app/student_signup.html')
+
 def instructor_signup_view(request):
-    store_login_or_signup_origin_path(request)
-    if request.method == 'POST':
-        signup_form = SignupForm(request.POST)
-        if signup_form.is_valid():
-            user = signup_form.save(commit=False)
-            user.username = f"user_{uuid.uuid4().hex[:12]}"
-            user.role = CustomUser.Role.INSTRUCTOR
-            user.is_active = False
-            user.save()
-            _send_activation_email(request, user)
-            return redirect('signup_done')
-    else:
-        signup_form = SignupForm()
-    return render(request, 'accounts_app/instructor_signup.html', {'signup_form': signup_form})
+    return _signup_view(request, CustomUser.Role.INSTRUCTOR, 'accounts_app/instructor_signup.html')
 
 def instructor_profile_view(request, user_id):
     instructor = get_object_or_404(CustomUser, id=user_id, role=CustomUser.Role.INSTRUCTOR)
@@ -111,8 +99,7 @@ def _authenticate_by_email(request, email, password):
         return None, None
     return authenticate(request, username=user.username, password=password), user
 
-# ログイン処理 - 受講者側
-def student_login_view(request):
+def _login_view(request, redirect_url, template_name):
     store_login_or_signup_origin_path(request)
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
@@ -122,7 +109,7 @@ def student_login_view(request):
             user, db_user = _authenticate_by_email(request, email, password)
             if user is not None:
                 login(request, user)
-                return redirect('student_dashboard')
+                return redirect(redirect_url)
             else:
                 logger.warning(f"[LOGIN_FAILED] email={email}")
                 if db_user and not db_user.is_active:
@@ -131,29 +118,13 @@ def student_login_view(request):
                     login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
     else:
         login_form = LoginForm()
-    return render(request, 'accounts_app/student_login.html', {'login_form': login_form})
+    return render(request, template_name, {'login_form': login_form})
 
-# ログイン処理 - インストラクター側
+def student_login_view(request):
+    return _login_view(request, 'student_dashboard', 'accounts_app/student_login.html')
+
 def instructor_login_view(request):
-    store_login_or_signup_origin_path(request)
-    if request.method == 'POST':
-        login_form = LoginForm(request.POST)
-        if login_form.is_valid():
-            email = login_form.cleaned_data['email']
-            password = login_form.cleaned_data['password']
-            user, db_user = _authenticate_by_email(request, email, password)
-            if user is not None:
-                login(request, user)
-                return redirect('instructor_dashboard')
-            else:
-                logger.warning(f"[LOGIN_FAILED] email={email}")
-                if db_user and not db_user.is_active:
-                    login_form.add_error(None, 'メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。')
-                else:
-                    login_form.add_error(None, 'メールアドレスまたはパスワードが違います')
-    else:
-        login_form = LoginForm()
-    return render(request, 'accounts_app/instructor_login.html', {'login_form': login_form})
+    return _login_view(request, 'instructor_dashboard', 'accounts_app/instructor_login.html')
 
 # ログアウト処理
 @login_required
@@ -177,36 +148,32 @@ def student_setting(request):
         messages.error(request, '受講者としてログインしてください。')
         return redirect('student_dashboard')
 
-    # 「更新ボタン」が押された時
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
         password_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
 
         user_valid = user_form.is_valid()
-
-        # パスワード欄が入力されている場合のみ検証・保存
-        password_fields_filled = any([
-            request.POST.get('old_password'),
-            request.POST.get('new_password1'),
-            request.POST.get('new_password2'),
-        ])
+        password_fields_filled = is_password_fields_filled(request.POST)
         password_valid = password_form.is_valid() if password_fields_filled else True
 
-        if user_valid:
+        if user_valid and password_valid:
             user_form.save()
-
-        if password_fields_filled and password_valid:
-            user = password_form.save()
-            update_session_auth_hash(request, user)
-
-        if not user_valid or (password_fields_filled and not password_valid):
-            messages.error(request, '入力内容に誤りがあります。確認してください')
-        else:
+            if password_fields_filled:
+                user = password_form.save()
+                update_session_auth_hash(request, user)
             messages.success(request, 'ユーザー情報を更新しました')
             return redirect('student_setting')
-        
-    user_form = UserUpdateForm(instance=request.user)
-    password_form = CustomPasswordChangeForm(user=request.user)
+        else:
+            messages.error(request, '入力内容に誤りがあります。確認してください')
+            params = {
+                'user_form': user_form,
+                'password_form': password_form,
+            }
+            return render(request, 'accounts_app/student_setting.html', params)
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        password_form = CustomPasswordChangeForm(user=request.user)
+
     params = {
         'user_form': user_form,
         'password_form': password_form,
@@ -238,11 +205,7 @@ def instructor_setting(request):
         user_valid = user_form.is_valid()
         instructor_profile_valid = instructor_profile_form.is_valid()
 
-        password_fields_filled = any([
-            request.POST.get('old_password'),
-            request.POST.get('new_password1'),
-            request.POST.get('new_password2'),
-        ])
+        password_fields_filled = is_password_fields_filled(request.POST)
         password_valid = password_form.is_valid() if password_fields_filled else True
 
         if user_valid and password_valid and instructor_profile_valid:

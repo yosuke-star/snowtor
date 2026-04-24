@@ -2,25 +2,10 @@ from django import forms
 from django.forms.widgets import DateInput
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+from common.form_utils import COMMON_INPUT_CLASS
 from .models import InstructorProfile
 
 User = get_user_model()
-
-# 共通のCSSクラス
-COMMON_INPUT_CLASS = '''
-    mt-1
-    block
-    w-full
-    px-3
-    py-2
-    border
-    border-gray-300
-    rounded-md shadow-sm
-    focus:outline-none
-    focus:ring-indigo-500
-    focus:border-indigo-500
-    sm:text-sm
-'''.strip()
 
 # 共通のチェックボックスのクラス
 CHECKBOX_CLASS = 'form-checkbox h-5 w-5 text-sky-600'

@@ -1,13 +1,16 @@
 import logging
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Count
 from django.views.decorators.http import require_POST
+from .decorators import instructor_required, student_required
 from .forms import LessonDetailForm, LessonSearchForm
+from .utils import error_response
 from accounts_app.models import InstructorProfile
 from .models import ActivityChoices, LessonDetail, LessonPreference, SkiResort
 import stripe
@@ -78,11 +81,8 @@ def _is_profile_complete(user):
         return False
     return bool(profile.self_introduction) and (profile.skill_ski or profile.skill_snowboard)
 
-@login_required
+@instructor_required
 def instructor_schedule(request):
-    if not request.user.is_instructor:
-        return error_response(request, 'インストラクターのみアクセス可能です。')
-
     profile_complete = _is_profile_complete(request.user)
 
     if request.method == 'POST':
@@ -93,6 +93,7 @@ def instructor_schedule(request):
             lesson_detail = form.save(commit=False)
             lesson_detail.instructor = request.user
             lesson_detail.save()
+            messages.success(request, 'レッスンを登録しました。')
             return redirect('instructor_schedule')
     else:
         form = LessonDetailForm()
@@ -127,11 +128,6 @@ def get_lesson_price(lesson):
         }.get(slot)
     return 0
 
-# エラーページ表示の共通化
-def error_response(request, message, status=403):
-    logger.warning(f"[ERROR_RESPONSE] user={request.user} message={message}")
-    return render(request, 'error.html', {'message': message}, status=status)
-
 # レッスンデータをJSONで返すビュー
 @login_required
 def instructor_events(request):
@@ -150,10 +146,8 @@ def instructor_events(request):
     return JsonResponse(events, safe=False)
 
 # 受講者側がインストラクターのレッスン状況を取得する
-@login_required
+@student_required
 def lesson_search(request):
-    if not request.user.is_student:
-        return error_response(request, '受講者のみアクセス可能です。')
 
     form = LessonSearchForm(request.GET or None)
     lessons = LessonDetail.objects.none()  # デフォルトは空
@@ -162,6 +156,8 @@ def lesson_search(request):
         today = timezone.localtime().date()
         lessons = LessonDetail.objects.select_related(
             "activity_type", "instructor", "prefecture", "ski_resort"
+        ).annotate(
+            reserved_count=Count('lessonpreference')
         ).filter(lesson_date__gte=today)
 
         cd = form.cleaned_data
@@ -182,8 +178,7 @@ def lesson_search(request):
 
         for lesson in lessons:
             lesson.price = get_lesson_price(lesson)
-            reserved_count = LessonPreference.objects.filter(lesson_detail=lesson).count()
-            lesson.is_full = reserved_count >= lesson.max_students
+            lesson.is_full = lesson.reserved_count >= lesson.max_students
 
     return render(
         request,
@@ -194,8 +189,9 @@ def lesson_search(request):
         }
     )
 
-@login_required
+@student_required
 def lesson_confirm_view(request, lesson_id):
+
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
     lesson.price = get_lesson_price(lesson)
 
@@ -205,19 +201,16 @@ def lesson_confirm_view(request, lesson_id):
         {'lesson': lesson,}
     )
 
-@login_required
+@student_required
 def lesson_reserve_view(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
-
-    if not request.user.is_student:
-        return error_response(request, '受講者のみ予約できます。')
 
     # 重複予約チェック
     if LessonPreference.objects.filter(student=request.user, lesson_detail=lesson).exists():
         return redirect('lesson_history')
 
     # 定員チェック
-    if LessonPreference.objects.filter(lesson_detail=lesson).count() >= lesson.max_students:
+    if lesson.is_at_capacity:
         return error_response(request, '定員に達しているため予約できません。')
 
     LessonPreference.objects.create(student=request.user, lesson_detail=lesson)
@@ -276,10 +269,8 @@ def student_events(request):
 
     return JsonResponse(events, safe=False)
 
-@login_required
+@instructor_required
 def instructor_history_view(request):
-    if not request.user.is_instructor:
-        return error_response(request, 'インストラクターのみアクセス可能です。')
 
     lessons = LessonDetail.objects.filter(
         instructor=request.user).order_by(
@@ -304,6 +295,7 @@ def cancel_preference(request, pref_id):
     return redirect('instructor_history')
 
 @login_required
+@require_POST
 def cancel_lesson(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
@@ -317,7 +309,6 @@ def cancel_lesson(request, lesson_id):
     return redirect('instructor_history')
 
 @login_required
-@csrf_exempt
 def create_checkout_session(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
@@ -354,7 +345,7 @@ def payment_success(request, lesson_id):
         return render(request, 'dashboard_app/payment_success.html')
 
     # 定員チェック（決済後に他の受講者で埋まった場合を考慮）
-    if LessonPreference.objects.filter(lesson_detail=lesson).count() >= lesson.max_students:
+    if lesson.is_at_capacity:
         return error_response(request, '定員に達しているため予約を完了できませんでした。')
 
     LessonPreference.objects.create(student=request.user, lesson_detail=lesson)
