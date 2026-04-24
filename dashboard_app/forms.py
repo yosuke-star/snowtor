@@ -1,21 +1,16 @@
 from django import forms
+from common.form_utils import COMMON_INPUT_CLASS
 from .models import ActivityType, LessonDetail, Prefecture, SkiResort
 
-# 共通のCSSクラス
-COMMON_INPUT_CLASS = '''
-    mt-1
-    block
-    w-full
-    px-3
-    py-2
-    border
-    border-gray-300
-    rounded-md shadow-sm
-    focus:outline-none
-    focus:ring-indigo-500
-    focus:border-indigo-500
-    sm:text-sm
-'''
+def date_input_widget():
+    return forms.DateInput(attrs={
+        'type': 'date',
+        'class': COMMON_INPUT_CLASS + ' cursor-pointer [color-scheme:light]',
+        'onkeydown': 'return false',
+        'style': 'color: transparent;',
+        'onfocus': "this.style.color=''; document.getElementById('date-placeholder').style.display='none'",
+        'onblur': "if(!this.value){ this.style.color='transparent'; document.getElementById('date-placeholder').style.display='flex'; }",
+    })
 
 class LessonDetailForm(forms.ModelForm):
     prefecture = forms.ModelChoiceField(
@@ -41,14 +36,7 @@ class LessonDetailForm(forms.ModelForm):
         model = LessonDetail
         exclude = ['instructor'] # instructor は除外する
         widgets = {
-            'lesson_date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': COMMON_INPUT_CLASS + ' cursor-pointer [color-scheme:light]',
-                'onkeydown': 'return false',
-                'style': 'color: transparent;',
-                'onfocus': "this.style.color=''; document.getElementById('date-placeholder').style.display='none'",
-                'onblur': "if(!this.value){ this.style.color='transparent'; document.getElementById('date-placeholder').style.display='flex'; }",
-            }),
+            'lesson_date': date_input_widget(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -103,14 +91,7 @@ class LessonSearchForm(forms.Form):
     lesson_date = forms.DateField(
         label="レッスン日",
         required=False,
-        widget=forms.DateInput(attrs={
-            'type': 'date',
-            'class': COMMON_INPUT_CLASS + ' cursor-pointer [color-scheme:light]',
-            'onkeydown': 'return false',
-            'style': 'color: transparent;',
-            'onfocus': "this.style.color=''; document.getElementById('date-placeholder').style.display='none'",
-            'onblur': "if(!this.value){ this.style.color='transparent'; document.getElementById('date-placeholder').style.display='flex'; }",
-        })
+        widget=date_input_widget(),
     )
 
     prefecture = forms.ModelChoiceField(

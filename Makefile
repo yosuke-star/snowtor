@@ -39,3 +39,9 @@ setup:
 	$(COMPOSE) exec web python3 manage.py loaddata prefectures
 	$(COMPOSE) exec web python3 manage.py loaddata activity_types
 	$(COMPOSE) exec web python3 manage.py loaddata ski_resorts
+
+test:
+	$(COMPOSE) exec web python3 manage.py test
+
+test-app:
+	$(COMPOSE) exec web python3 manage.py test accounts_app
