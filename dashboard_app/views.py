@@ -1,5 +1,6 @@
 import logging
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -93,6 +94,7 @@ def instructor_schedule(request):
             lesson_detail = form.save(commit=False)
             lesson_detail.instructor = request.user
             lesson_detail.save()
+            messages.success(request, 'レッスンを登録しました。')
             return redirect('instructor_schedule')
     else:
         form = LessonDetailForm()
