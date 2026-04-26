@@ -35,7 +35,7 @@
                         <dd class="text-gray-900">{{ item.lesson.instructor.username }}</dd>
 
                         <dt class="font-semibold text-gray-700">料金</dt>
-                        <dd class="text-gray-900">¥ {{ item.price|default:"-"|intcomma }}</dd>
+                        <dd class="text-gray-900">¥ {{ item.lesson.price|intcomma }}</dd>
                         
                         <dt class="font-semibold text-gray-700">登録日</dt>
                         <dd class="text-gray-900">{{ item.preference.created_at|date:"Y年m月d日" }}</dd>

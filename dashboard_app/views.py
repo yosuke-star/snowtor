@@ -12,7 +12,7 @@ from .decorators import instructor_required, student_required
 from .forms import LessonDetailForm, LessonSearchForm
 from .utils import error_response
 from accounts_app.models import InstructorProfile
-from .models import ActivityChoices, LessonDetail, LessonPreference, SkiResort
+from .models import LessonDetail, LessonPreference, SkiResort
 import stripe
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # ダッシュボード - 受講者
-@login_required
+@student_required
 def student_dashboard_view(request):
     today = timezone.localtime().date()
     # 受講者の予約履歴を取得（未来の日付のみ表示）
@@ -39,7 +39,7 @@ def student_dashboard_view(request):
     )
 
 # ダッシュボード - インストラクター
-@login_required
+@instructor_required
 def instructor_dashboard_view(request):
     today = timezone.localtime().date()
     instructor = request.user
@@ -106,41 +106,23 @@ def instructor_schedule(request):
 # フロントの都道府県選択に応じて対応するスキー場を返すAjaxエンドポイント
 @login_required
 def get_ski_resorts(request):
-    prefecture_id = request.GET.get('prefecture_id')
+    try:
+        prefecture_id = int(request.GET.get('prefecture_id'))
+    except (TypeError, ValueError):
+        return JsonResponse([], safe=False)
     ski_resorts = SkiResort.objects.filter(prefecture_id=prefecture_id).values('id', 'resort_name')
     return JsonResponse(list(ski_resorts), safe=False)
 
-# 価格取得ロジック共通化
-def get_lesson_price(lesson):
-    activity = lesson.activity_type.activity_name
-    slot = lesson.time_slot
-    if activity == ActivityChoices.SKI:
-        return {
-            'morning': lesson.ski_morning_price,
-            'afternoon': lesson.ski_afternoon_price,
-            'full_day': lesson.ski_full_day_price,
-        }.get(slot)
-    elif activity == ActivityChoices.SNOWBOARD:
-        return {
-            'morning': lesson.snowboard_morning_price,
-            'afternoon': lesson.snowboard_afternoon_price,
-            'full_day': lesson.snowboard_full_day_price,
-        }.get(slot)
-    return 0
-
 # レッスンデータをJSONで返すビュー
-@login_required
+@instructor_required
 def instructor_events(request):
     lessons = LessonDetail.objects.filter(instructor=request.user)
     events = []
 
     for lesson in lessons:
-        price = get_lesson_price(lesson)
-
-        # カレンダーに表示させるデータを整形
         events.append({
-            "title": f"¥{price}",
-            "start": f"{lesson.lesson_date}T09:00:00",  # 固定 or time_slot で調整してもOK
+            "title": f"¥{lesson.price}",
+            "start": f"{lesson.lesson_date}T09:00:00",
         })
 
     return JsonResponse(events, safe=False)
@@ -177,7 +159,6 @@ def lesson_search(request):
             lessons = lessons.filter(time_slot=cd['time_slot'])
 
         for lesson in lessons:
-            lesson.price = get_lesson_price(lesson)
             lesson.is_full = lesson.reserved_count >= lesson.max_students
 
     return render(
@@ -191,15 +172,8 @@ def lesson_search(request):
 
 @student_required
 def lesson_confirm_view(request, lesson_id):
-
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
-    lesson.price = get_lesson_price(lesson)
-
-    return render(
-        request,
-        'dashboard_app/lesson_confirm.html',
-        {'lesson': lesson,}
-    )
+    return render(request, 'dashboard_app/lesson_confirm.html', {'lesson': lesson})
 
 @student_required
 def lesson_reserve_view(request, lesson_id):
@@ -216,22 +190,19 @@ def lesson_reserve_view(request, lesson_id):
     LessonPreference.objects.create(student=request.user, lesson_detail=lesson)
     return redirect('lesson_history')
 
-@login_required
+@student_required
 def lesson_history_view(request):
     preferences = LessonPreference.objects.filter(
         student=request.user).select_related(
             'lesson_detail__activity_type',
             'lesson_detail__ski_resort').order_by('-created_at')
 
-    # 金額を含めた情報のリストをテンプレートに渡す
     history_data = []
     for pref in preferences:
         lesson = pref.lesson_detail
-        price = get_lesson_price(lesson)
         history_data.append({
             'preference': pref,
             'lesson': lesson,
-            'price': price,
         })
 
     return render(
@@ -247,7 +218,7 @@ def lesson_cancel_view(request, preference_id):
     preference.delete()
     return redirect('lesson_history')
 
-@login_required
+@student_required
 def student_events(request):
     preferences = LessonPreference.objects.filter(
         student=request.user).select_related('lesson_detail')
@@ -282,8 +253,8 @@ def instructor_history_view(request):
         {'lessons': lessons,}
     )
 
-@require_POST
 @login_required
+@require_POST
 def cancel_preference(request, pref_id):
     pref = get_object_or_404(LessonPreference, id=pref_id)
 
@@ -308,14 +279,10 @@ def cancel_lesson(request, lesson_id):
     lesson.delete()
     return redirect('instructor_history')
 
-@login_required
+@student_required
 def create_checkout_session(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
-    # 仮に price 属性がないときは補完しておく
-    if not hasattr(lesson, 'price') or lesson.price is None:
-        lesson.price = get_lesson_price(lesson)
-    
     # Stripe Checkout セッション作成
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
@@ -336,7 +303,7 @@ def create_checkout_session(request, lesson_id):
 
     return redirect(session.url, code=303)
 
-@login_required
+@student_required
 def payment_success(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
@@ -352,7 +319,7 @@ def payment_success(request, lesson_id):
     logger.info(f"[PAYMENT_SUCCESS] user={request.user} lesson_id={lesson_id}")
     return render(request, 'dashboard_app/payment_success.html')
 
-@login_required
+@student_required
 def payment_cancel(request, lesson_id):
     logger.info(f"[PAYMENT_CANCEL] user={request.user} lesson_id={lesson_id}")
     return render(request, 'dashboard_app/payment_cancel.html')
