@@ -106,7 +106,10 @@ def instructor_schedule(request):
 # フロントの都道府県選択に応じて対応するスキー場を返すAjaxエンドポイント
 @login_required
 def get_ski_resorts(request):
-    prefecture_id = request.GET.get('prefecture_id')
+    try:
+        prefecture_id = int(request.GET.get('prefecture_id'))
+    except (TypeError, ValueError):
+        return JsonResponse([], safe=False)
     ski_resorts = SkiResort.objects.filter(prefecture_id=prefecture_id).values('id', 'resort_name')
     return JsonResponse(list(ski_resorts), safe=False)
 
@@ -308,7 +311,7 @@ def cancel_lesson(request, lesson_id):
     lesson.delete()
     return redirect('instructor_history')
 
-@login_required
+@student_required
 def create_checkout_session(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
@@ -336,7 +339,7 @@ def create_checkout_session(request, lesson_id):
 
     return redirect(session.url, code=303)
 
-@login_required
+@student_required
 def payment_success(request, lesson_id):
     lesson = get_object_or_404(LessonDetail, id=lesson_id)
 
@@ -352,7 +355,7 @@ def payment_success(request, lesson_id):
     logger.info(f"[PAYMENT_SUCCESS] user={request.user} lesson_id={lesson_id}")
     return render(request, 'dashboard_app/payment_success.html')
 
-@login_required
+@student_required
 def payment_cancel(request, lesson_id):
     logger.info(f"[PAYMENT_CANCEL] user={request.user} lesson_id={lesson_id}")
     return render(request, 'dashboard_app/payment_cancel.html')
