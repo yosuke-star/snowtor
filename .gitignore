@@ -37,4 +37,10 @@ yarn-error.log*
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# User uploaded files
+media/
+
+# Django collectstatic output
+staticfiles/

@@ -38,9 +38,9 @@
                             <li><a href="{% url 'lesson_history' %}" class="hover:text-gray-500 transition">履歴</a></li>
                             <li>
                                 <a href="{% url 'student_setting' %}">
-                                    <img src="{% static 'images/favicon.png' %}"
+                                    <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}{% static 'images/favicon.png' %}{% endif %}"
                                     alt="ユーザーアイコン"
-                                    class="h-10 w-10 rounded-full cursor-pointer hover:opacity-80 transition duration-200">
+                                    class="h-10 w-10 rounded-full cursor-pointer hover:opacity-80 transition duration-200 object-cover">
                                 </a>
                             </li>
                         {% elif user.is_instructor %}
@@ -48,9 +48,9 @@
                             <li><a href="{% url 'instructor_history' %}" class="hover:text-gray-500 transition">履歴</a></li>
                             <li>
                                 <a href="{% url 'instructor_setting' %}">
-                                    <img src="{% static 'images/favicon.png' %}"
+                                    <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% else %}{% static 'images/favicon.png' %}{% endif %}"
                                     alt="ユーザーアイコン"
-                                    class="h-10 w-10 rounded-full cursor-pointer hover:opacity-80 transition duration-200">
+                                    class="h-10 w-10 rounded-full cursor-pointer hover:opacity-80 transition duration-200 object-cover">
                                 </a>
                             </li>
                         {% endif %}
