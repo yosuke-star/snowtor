@@ -44,4 +44,3 @@ media/
 
 # Django collectstatic output
 staticfiles/
->>>>>>> 5f896a25949395127ccd941a0fe5fd5f8a1e5a43
