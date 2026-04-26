@@ -2,8 +2,15 @@ from django import forms
 from django.forms.widgets import DateInput
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
+from django.core.exceptions import ValidationError
 from common.form_utils import COMMON_INPUT_CLASS
 from .models import InstructorProfile
+
+MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
+
+def validate_profile_image_size(image):
+    if image and image.size > MAX_PROFILE_IMAGE_SIZE:
+        raise ValidationError('画像サイズは5MB以下にしてください。')
 
 User = get_user_model()
 
@@ -109,6 +116,7 @@ class UserUpdateForm(forms.ModelForm):
         apply_common_attrs(self, field_settings)
         
         self.fields['profile_image'].label = '画像'
+        self.fields['profile_image'].validators.append(validate_profile_image_size)
         self.fields['username'].label = 'ニックネーム'
         self.fields['postal_code'].label = '郵便番号'
         self.fields['address'].label = '住所'

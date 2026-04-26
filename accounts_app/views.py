@@ -149,7 +149,7 @@ def student_setting(request):
         return redirect('student_dashboard')
 
     if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=request.user)
+        user_form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         password_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
 
         user_valid = user_form.is_valid()
@@ -198,7 +198,7 @@ def instructor_setting(request):
 
     # 「更新ボタン」が押された時
     if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=request.user)
+        user_form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         password_form = CustomPasswordChangeForm(user=request.user, data=request.POST)
         instructor_profile_form = InstructorProfileForm(request.POST, instance=instructor_profile)
 
