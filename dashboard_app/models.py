@@ -74,6 +74,22 @@ class LessonDetail(models.Model):
         return dict(self.TIME_SLOT_CHOICES).get(self.time_slot, '未設定')
 
     @property
+    def price(self):
+        prices = {
+            ActivityChoices.SKI: {
+                'morning': self.ski_morning_price,
+                'afternoon': self.ski_afternoon_price,
+                'full_day': self.ski_full_day_price,
+            },
+            ActivityChoices.SNOWBOARD: {
+                'morning': self.snowboard_morning_price,
+                'afternoon': self.snowboard_afternoon_price,
+                'full_day': self.snowboard_full_day_price,
+            },
+        }
+        return prices.get(self.activity_type.activity_name, {}).get(self.time_slot) or 0
+
+    @property
     def is_at_capacity(self):
         return self.lessonpreference_set.count() >= self.max_students
 
