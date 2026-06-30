@@ -1,13 +1,12 @@
 {
-  "name": "django-project",
+  "name": "snowtor",
   "version": "1.0.0",
-  "description": "This project is ストトラ",
+  "description": "This project is snowtor. スキーレッスン予約サービス。",
   "scripts": {
-    "build": "npm run build:css",
-    "build:css": "sass static/scss:static/css"
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/style.css"
   },
-  "dependencies": {
-    "bootstrap": "^5.3.2",
-    "sass": "^1.71.1"
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.2",
+    "tailwindcss": "^4.3.2"
   }
 }
