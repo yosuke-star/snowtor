@@ -1,10 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Zen+Maru+Gothic:wght@700&display=swap");
 @import "tailwindcss";
 
+@theme {
+    --font-sans: "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
+    --font-gothic: "Zen Maru Gothic", serif;
+}
+
 body {
-    font-family: "Zen Maru Gothic", serif;
+    font-family: var(--font-sans);
     font-weight: 400;
-    font-style: normal;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-gothic);
+    font-weight: 700;
 }
 
 /* カレンダーの数値を中央寄せ */

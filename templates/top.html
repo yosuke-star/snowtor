@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/png">
 </head>
-<body class="flex flex-col min-h-screen bg-gray-100">
+<body class="flex flex-col min-h-screen bg-white">
 
     <!-- ヘッダー -->
     <header class="bg-blue-100 px-4 py-3 flex items-center justify-between h-16 sm:h-20">
@@ -23,24 +23,37 @@
     <main class="flex-grow">
 
         <!-- ヒーローセクション -->
-        <section class="bg-blue-100 py-20 px-4 text-center">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 mb-6 leading-tight">
-                スキー・スノーボードの<br>レッスンを、もっと手軽に。
-            </h1>
-            <p class="text-lg text-gray-600 mb-10 max-w-xl mx-auto">
-                スノトラは、インストラクターと受講者をつなぐレッスン予約マッチングサービスです。
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="{% url 'student_signup' %}"
-                   class="py-3 px-8 text-base font-bold text-white bg-sky-600 rounded-md
-                          hover:bg-sky-700 transition duration-300 shadow-md">
-                    受講者として始める
-                </a>
-                <a href="{% url 'instructor_signup' %}"
-                   class="py-3 px-8 text-base font-bold text-sky-600 border-2 border-sky-600 rounded-md
-                          hover:bg-sky-50 transition duration-300 shadow-md">
-                    インストラクターとして始める
-                </a>
+        <section class="bg-gradient-to-b from-blue-100 to-white py-20 px-4">
+            <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-10">
+                <div class="flex-1 text-center sm:text-left">
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-800 mb-6 leading-tight">
+                        スキー・スノーボードのレッスンを、もっと手軽に。
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-10 max-w-xl mx-auto sm:mx-0">
+                        スノトラは、インストラクターと受講者をつなぐレッスン予約マッチングサービスです。
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center sm:justify-start gap-4">
+                        <a href="{% url 'student_signup' %}"
+                           class="py-3 px-8 text-base font-bold text-white bg-sky-600 rounded-md
+                                  hover:bg-sky-700 transition duration-300 shadow-md">
+                            受講者として始める
+                        </a>
+                        <a href="{% url 'instructor_signup' %}"
+                           class="py-3 px-8 text-base font-bold text-sky-600 border-2 border-sky-600 rounded-md
+                                  hover:bg-sky-50 transition duration-300 shadow-md">
+                            インストラクターとして始める
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:block flex-1">
+                    <svg viewBox="0 0 400 260" class="w-full h-auto" role="img" aria-label="雪山のイラスト">
+                        <circle cx="330" cy="60" r="34" fill="#fde68a" />
+                        <path d="M0 220 L110 90 L170 160 L230 70 L400 220 Z" fill="#38bdf8" opacity="0.35" />
+                        <path d="M0 230 L140 110 L200 175 L260 95 L400 230 Z" fill="#0284c7" opacity="0.85" />
+                        <path d="M110 90 L140 125 L125 130 L155 150 L95 150 L125 130 L110 125 Z" fill="#ffffff" />
+                        <path d="M260 95 L285 125 L272 129 L297 148 L245 148 L270 129 L258 125 Z" fill="#ffffff" />
+                    </svg>
+                </div>
             </div>
         </section>
 
@@ -49,19 +62,55 @@
             <h2 class="text-2xl font-extrabold text-center text-gray-800 mb-12">スノトラの特徴</h2>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
                 <div class="bg-white rounded-lg shadow p-6 text-center">
-                    <div class="text-4xl mb-4">🎿</div>
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-sky-100 mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
                     <h3 class="text-lg font-bold text-gray-800 mb-2">かんたん検索</h3>
                     <p class="text-sm text-gray-600">日程・エリア・レベルから条件に合ったレッスンをすぐに見つけられます。</p>
                 </div>
                 <div class="bg-white rounded-lg shadow p-6 text-center">
-                    <div class="text-4xl mb-4">📅</div>
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-sky-100 mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
                     <h3 class="text-lg font-bold text-gray-800 mb-2">オンライン予約</h3>
                     <p class="text-sm text-gray-600">紙の手続き不要。予約から決済まですべてオンラインで完結します。</p>
                 </div>
                 <div class="bg-white rounded-lg shadow p-6 text-center">
-                    <div class="text-4xl mb-4">👨‍🏫</div>
+                    <div class="flex items-center justify-center w-14 h-14 rounded-full bg-sky-100 mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
                     <h3 class="text-lg font-bold text-gray-800 mb-2">インストラクター管理</h3>
                     <p class="text-sm text-gray-600">日程・料金・受講者の管理をまとめて行えます。業務効率化をサポート。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 利用の流れセクション -->
+        <section class="py-16 px-4 bg-gray-50">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-2xl font-extrabold text-center text-gray-800 mb-12">ご利用の流れ</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-10 h-10 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center mx-auto mb-4">1</div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">会員登録</h3>
+                        <p class="text-sm text-gray-600">受講者・インストラクターどちらかの立場で無料登録します。</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-10 h-10 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center mx-auto mb-4">2</div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">レッスンを探して予約</h3>
+                        <p class="text-sm text-gray-600">エリアや日程で検索し、希望のレッスンをオンラインで予約します。</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-10 h-10 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center mx-auto mb-4">3</div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">当日レッスンを受講</h3>
+                        <p class="text-sm text-gray-600">ゲレンデで待ち合わせて、インストラクターのレッスンを受けるだけ。</p>
+                    </div>
                 </div>
             </div>
         </section>

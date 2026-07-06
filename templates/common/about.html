@@ -1,18 +1,81 @@
 {% extends "accounts_app/base.html" %}
 
+{% block title %}スノトラについて | スノトラ{% endblock %}
+
 {% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
 
-<div class="max-w-3xl mx-auto py-12 px-4 sm:px-8 text-gray-800 text-base sm:text-lg leading-7">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">このサービスについて</h1>
-    <p class="mb-4">
-        <span class="font-semibold">スキー・スノーボードのインストラクター</span>と
-        <span class="font-semibold">受講者</span>をつなぐ<br class="sm:hidden">
-        マッチングサービスです。
-    </p>
-    <p class="mb-4">
-        楽しく安全な雪山体験を、<br class="sm:hidden">
-        私たちがしっかりサポートします！
-    </p>
+    <!-- ページタイトル -->
+    <div class="mb-16 text-center">
+        <p class="text-sm font-medium tracking-widest text-sky-600 uppercase mb-1">About</p>
+        <h1 class="text-3xl">スノトラについて</h1>
+    </div>
+
+    <!-- キャッチフレーズ -->
+    <div class="mb-16 text-center">
+        <p class="text-4xl sm:text-5xl font-gothic font-bold text-gray-800 leading-tight mb-6">
+            雪山をもっと身近に。
+        </p>
+        <p class="text-sm text-gray-600 leading-8 max-w-xl mx-auto">
+            スノトラは、スキー・スノーボードのインストラクターと受講者をつなぐマッチングプラットフォームです。
+            個人で活動するインストラクターが集客・予約・決済をオンラインで完結できる環境を整え、
+            受講者が信頼できるインストラクターを手軽に見つけられる仕組みを提供します。
+        </p>
+    </div>
+
+    <!-- 区切り線 -->
+    <div class="flex items-center gap-4 mb-16">
+        <div class="flex-1 border-t border-gray-200"></div>
+        <span class="text-xs tracking-widest text-gray-400 uppercase">Our Story</span>
+        <div class="flex-1 border-t border-gray-200"></div>
+    </div>
+
+    <!-- 生まれた背景 -->
+    <div class="mb-16 space-y-5 text-sm text-gray-600 leading-8">
+        <p>
+            個人インストラクターの多くは、技術はあっても集客に苦労しています。
+            レッスンの告知はSNSや口コミに頼りがちで、スケジュール管理や決済も手作業になりがちです。
+        </p>
+        <p>
+            一方、初心者や上達したいスキーヤー・スノーボーダーには「どこで誰に習えばいいかわからない」という声が多くあります。
+            せっかく雪山に行っても、正しい指導を受ける機会がなく、楽しさを十分に感じられないまま終わってしまうことも少なくありません。
+        </p>
+        <p>
+            スノトラは、その両者をシンプルにつなぐために生まれました。
+        </p>
+    </div>
+
+    <!-- 区切り線 -->
+    <div class="flex items-center gap-4 mb-16">
+        <div class="flex-1 border-t border-gray-200"></div>
+        <span class="text-xs tracking-widest text-gray-400 uppercase">Our Value</span>
+        <div class="flex-1 border-t border-gray-200"></div>
+    </div>
+
+    <!-- 3つの価値 -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
+        <div class="border border-gray-200 rounded-lg p-6">
+            <p class="text-xs tracking-widest text-sky-600 uppercase mb-3">For Instructors</p>
+            <h3 class="text-base font-bold text-gray-800 mb-2">インストラクターへ</h3>
+            <p class="text-xs text-gray-500 leading-6">
+                集客・スケジュール管理・決済をオンラインで完結。本来の仕事であるレッスンに集中できる環境を提供します。
+            </p>
+        </div>
+        <div class="border border-gray-200 rounded-lg p-6">
+            <p class="text-xs tracking-widest text-sky-600 uppercase mb-3">For Students</p>
+            <h3 class="text-base font-bold text-gray-800 mb-2">受講者へ</h3>
+            <p class="text-xs text-gray-500 leading-6">
+                日程・エリア・レベルで条件を絞って即予約。自分に合ったインストラクターをすぐに見つけられます。
+            </p>
+        </div>
+        <div class="border border-gray-200 rounded-lg p-6">
+            <p class="text-xs tracking-widest text-sky-600 uppercase mb-3">For Mountains</p>
+            <h3 class="text-base font-bold text-gray-800 mb-2">雪山へ</h3>
+            <p class="text-xs text-gray-500 leading-6">
+                安全で楽しいレッスンの機会を増やすことで、より多くの人が雪山の魅力を体験できる世界を目指します。
+            </p>
+        </div>
+    </div>
+
 </div>
-
 {% endblock %}

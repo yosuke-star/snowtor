@@ -4,6 +4,12 @@ COMPOSE  = docker compose -f docker-compose.dev.yml $(ENV_FILE)
 up:
 	$(COMPOSE) up -d
 
+build:
+	$(COMPOSE) build
+
+rebuild:
+	$(COMPOSE) up -d --build
+
 down:
 	$(COMPOSE) down
 
@@ -45,3 +51,12 @@ test:
 
 test-app:
 	$(COMPOSE) exec web python3 manage.py test accounts_app
+
+app-login:
+	$(COMPOSE) exec web bash
+
+db-login:
+	$(COMPOSE) exec db bash
+	
+dbshell:
+	$(COMPOSE) exec db bash -c 'psql -U $$POSTGRES_USER -d $$POSTGRES_DB'
