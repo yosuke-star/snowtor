@@ -1,14 +1,111 @@
 {% extends "accounts_app/base.html" %}
 
+{% block title %}お問い合わせ | スノトラ{% endblock %}
+
 {% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
 
-<div class="max-w-3xl mx-auto py-12 px-4 sm:px-8 text-gray-800 text-base sm:text-lg leading-7">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center">お問い合わせ</h1>
-    <p class="mb-4">
-        ご質問・ご意見などございましたら、以下のフォームまたはメールにてご連絡ください。
-    </p>
-    <p class="mb-4">📧 メール: <a href="mailto:support@example.com" class="text-blue-600 underline">support@example.com</a></p>
-    <p class="text-sm text-gray-500">※数日以内に返信いたします。迷惑メールフォルダもご確認ください。</p>
+    <!-- ページタイトル -->
+    <div class="mb-10 text-center">
+        <p class="text-sm font-medium tracking-widest text-sky-600 uppercase mb-1">Contact</p>
+        <h1 class="text-3xl">お問い合わせ</h1>
+        <p class="mt-4 text-sm text-gray-500">
+            ご不明点やご質問などございましたら、下記のフォームからお気軽にお問い合わせください。
+        </p>
+    </div>
+
+    <form action="" method="post">
+        {% csrf_token %}
+
+        <div class="border-t border-gray-200">
+
+            <!-- お問い合わせ種別 -->
+            <div class="flex border-b border-gray-200">
+                <div class="w-48 shrink-0 bg-gray-50 flex items-center justify-center px-4 py-6 text-sm font-medium text-gray-700 text-center">
+                    お問い合わせ種別
+                    <span class="ml-1.5 text-xs text-red-500 border border-red-500 px-1 rounded">必須</span>
+                </div>
+                <div class="flex-1 px-6 py-6 flex items-center">
+                    <select name="kind" id="kind"
+                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700
+                               focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent">
+                        <option value="">選択してください</option>
+                        <option value="レッスンについて">レッスンについて</option>
+                        <option value="料金について">料金について</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- お名前 -->
+            <div class="flex border-b border-gray-200">
+                <div class="w-48 shrink-0 bg-gray-50 flex items-center justify-center px-4 py-6 text-sm font-medium text-gray-700 text-center">
+                    お名前
+                    <span class="ml-1.5 text-xs text-red-500 border border-red-500 px-1 rounded">必須</span>
+                </div>
+                <div class="flex-1 px-6 py-6 flex items-center">
+                    <input id="name" type="text" name="name" placeholder="山田 太郎"
+                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700
+                               focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent">
+                </div>
+            </div>
+
+            <!-- メールアドレス -->
+            <div class="flex border-b border-gray-200">
+                <div class="w-48 shrink-0 bg-gray-50 flex items-center justify-center px-4 py-6 text-sm font-medium text-gray-700 text-center">
+                    メールアドレス
+                    <span class="ml-1.5 text-xs text-red-500 border border-red-500 px-1 rounded">必須</span>
+                </div>
+                <div class="flex-1 px-6 py-6 flex items-center">
+                    <input id="mail" type="email" name="mail" placeholder="example@email.com"
+                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700
+                               focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent">
+                </div>
+            </div>
+
+            <!-- お問い合わせ内容 -->
+            <div class="flex border-b border-gray-200">
+                <div class="w-48 shrink-0 bg-gray-50 flex items-center justify-center px-4 py-6 text-sm font-medium text-gray-700 text-center">
+                    お問い合わせ内容
+                    <span class="ml-1.5 text-xs text-red-500 border border-red-500 px-1 rounded">必須</span>
+                </div>
+                <div class="flex-1 px-6 py-6">
+                    <textarea name="message" id="message" rows="5" placeholder="お問い合わせ内容をご記入ください"
+                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-700
+                               focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent resize-none"></textarea>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 個人情報の取り扱い -->
+        <div class="mt-8 rounded border border-gray-200 p-6">
+            <p class="text-sm font-medium text-gray-700 text-center mb-3">個人情報の取り扱いについて</p>
+            <div class="text-xs text-gray-500 space-y-2">
+                <p>当社は、お客様の個人情報について個人情報保護に関する法令およびその他の規範を遵守します。</p>
+                <p>1. 収集した個人情報は、お問い合わせへの回答にのみ使用します。</p>
+                <p>2. 第三者への提供は、法令に基づく場合を除き行いません。</p>
+                <p>3. 個人情報の開示・訂正・削除のご要望はお問い合わせください。</p>
+            </div>
+        </div>
+
+        <div class="mt-4 flex justify-center">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="privacy" id="privacy"
+                    class="w-4 h-4 rounded border-gray-300 text-sky-600 focus:bg-sky-700">
+                <span class="text-sm text-gray-700">個人情報の取り扱いに同意する</span>
+            </label>
+        </div>
+
+        <!-- 送信ボタン -->
+        <div class="mt-8 flex justify-center">
+            <button type="submit"
+                class="py-2 px-12 rounded bg-sky-600 text-white text-sm font-bold
+                       hover:bg-sky-700 transition duration-300">
+                送信
+            </button>
+        </div>
+
+    </form>
 </div>
-
 {% endblock %}
